@@ -21,6 +21,11 @@
     box-sizing: border-box;
 }
 
+html {
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+}
+
 :root {
     --bg-main: #0b0b0d;
     --bg-gradient: linear-gradient(135deg, #0b0b0d 0%, #15161a 100%);
@@ -56,6 +61,8 @@ body {
     font-family: var(--font-jp);
     min-height: 100vh;
     overflow-x: hidden;
+    overscroll-behavior-x: none;
+    touch-action: pan-y pinch-zoom;
     letter-spacing: 0.02em;
 }
 

@@ -1,0 +1,1235 @@
+/* Reset & Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+}
+
+:root {
+    --bg-main: #0b0b0d;
+    --bg-gradient: linear-gradient(135deg, #0b0b0d 0%, #15161a 100%);
+    --bg-surface: rgba(22, 22, 26, 0.65);
+    --bg-surface-hover: rgba(30, 30, 36, 0.8);
+    --bg-modal: rgba(18, 18, 22, 0.95);
+    
+    --border-color: rgba(255, 255, 255, 0.07);
+    --border-color-hover: rgba(255, 255, 255, 0.15);
+    
+    --text-primary: #f5f5f7;
+    --text-secondary: #9aa0a6;
+    --text-muted: #62676d;
+    
+    --accent-orange: #e05e2b;
+    --accent-gold: #c5a880;
+    --accent-teal: #10b981;
+    --danger-red: #ef4444;
+    
+    --font-outfit: 'Outfit', sans-serif;
+    --font-jp: 'Noto Sans JP', sans-serif;
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    --shadow-glow: 0 0 15px rgba(224, 94, 43, 0.2);
+    
+    --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+body {
+    background-color: var(--bg-main);
+    background-image: var(--bg-gradient);
+    color: var(--text-primary);
+    font-family: var(--font-jp);
+    min-height: 100vh;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+    touch-action: pan-y pinch-zoom;
+    letter-spacing: 0.02em;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* App Container */
+.app-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+}
+
+/* Header Section */
+.app-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.logo-area {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.brand {
+    font-family: var(--font-outfit);
+    font-weight: 800;
+    font-size: 2.2rem;
+    letter-spacing: 0.15em;
+    color: var(--text-primary);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.separator {
+    color: var(--accent-orange);
+    font-size: 1.8rem;
+    font-weight: 300;
+}
+
+.title {
+    font-family: var(--font-outfit);
+    font-weight: 400;
+    font-size: 1.8rem;
+    letter-spacing: 0.15em;
+    color: var(--accent-gold);
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 400;
+    opacity: 0.85;
+}
+
+/* Control Panel */
+.control-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    background: var(--bg-surface);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
+}
+
+@media (min-width: 768px) {
+    .control-panel {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+/* Search Wrapper */
+.search-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--text-muted);
+}
+
+.search-wrapper input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-family: var(--font-jp);
+    outline: none;
+    transition: var(--transition-smooth);
+}
+
+.search-wrapper input:focus {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 10px rgba(197, 168, 128, 0.15);
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.clear-btn {
+    position: absolute;
+    right: 0.75rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+}
+
+.clear-btn:hover svg {
+    color: var(--text-primary);
+}
+
+.clear-btn svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    transition: var(--transition-smooth);
+}
+
+/* Filter Controls */
+.filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.tabs {
+    display: flex;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border-color);
+    padding: 0.25rem;
+    border-radius: 10px;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 0.5rem 1.1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    font-family: var(--font-outfit);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.tab-btn.active {
+    background: var(--text-primary);
+    color: var(--bg-main);
+    font-weight: 600;
+}
+
+/* Favorite Toggle Button */
+.fav-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    border-radius: 10px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    font-weight: 500;
+}
+
+.fav-toggle-btn:hover {
+    border-color: var(--accent-orange);
+    color: var(--accent-orange);
+}
+
+.fav-toggle-btn.active {
+    background: rgba(224, 94, 43, 0.1);
+    border-color: var(--accent-orange);
+    color: var(--accent-orange);
+}
+
+.fav-toggle-btn.active svg {
+    fill: var(--accent-orange);
+}
+
+.fav-toggle-btn svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    transition: var(--transition-smooth);
+}
+
+.counter {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    padding: 0.1rem 0.4rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    margin-left: 0.25rem;
+    font-family: var(--font-outfit);
+}
+
+.fav-toggle-btn.active .counter {
+    background: var(--accent-orange);
+    color: white;
+}
+
+/* Stats Panel */
+.stats-panel {
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stats-panel::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--accent-teal);
+    box-shadow: 0 0 8px var(--accent-teal);
+}
+
+/* Recipe Grid */
+.recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    position: relative;
+    min-height: 200px;
+}
+
+/* Recipe Card */
+.recipe-card {
+    background: var(--bg-surface);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 380px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-smooth);
+}
+
+.recipe-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--border-color-hover);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+/* Card Image Area */
+.card-image-area {
+    position: relative;
+    height: 200px;
+    background: #121214;
+    overflow: hidden;
+}
+
+.card-image-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.recipe-card:hover .card-image-area img {
+    transform: scale(1.06);
+}
+
+.card-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #18191d 0%, #0d0e10 100%);
+    color: var(--text-muted);
+}
+
+.card-img-placeholder span {
+    font-size: 0.8rem;
+    font-family: var(--font-outfit);
+    letter-spacing: 0.08em;
+}
+
+.card-fav-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.08);
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    z-index: 5;
+    transition: var(--transition-smooth);
+}
+
+.card-fav-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: scale(1.1);
+    color: var(--accent-orange);
+}
+
+.card-fav-btn.active {
+    color: var(--accent-orange);
+}
+
+.card-fav-btn.active svg {
+    fill: var(--accent-orange);
+}
+
+.card-fav-btn svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    stroke-width: 2.2px;
+}
+
+
+.card-source-btn {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.08);
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    z-index: 5;
+    transition: var(--transition-smooth);
+}
+
+.card-source-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: scale(1.1);
+    color: var(--accent-gold);
+}
+
+.card-source-btn svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    stroke-width: 2.2px;
+}
+
+/* Card Body */
+.card-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+.card-meta-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.card-gen {
+    font-family: var(--font-outfit);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent-gold);
+    letter-spacing: 0.05em;
+}
+
+.card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.4;
+    height: 2.8rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+}
+
+.card-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 0.75rem;
+}
+
+.card-sim {
+    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    color: var(--text-secondary);
+}
+
+.card-arrow {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--text-muted);
+    transition: var(--transition-smooth);
+}
+
+.recipe-card:hover .card-arrow {
+    color: var(--accent-gold);
+    transform: translateX(3px);
+}
+
+/* Loading & Spinner */
+.loading-spinner-wrapper {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 0;
+    color: var(--text-secondary);
+}
+
+.spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--accent-gold);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Detail Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1000;
+    transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    padding: 1.5rem;
+}
+
+.modal-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Modal Container */
+.modal-container {
+    background: var(--bg-modal);
+    border: 1px solid var(--border-color-hover);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 1000px;
+    height: auto;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    transform: scale(0.95);
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.modal-overlay.open .modal-container {
+    transform: scale(1);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    z-index: 10;
+}
+
+.modal-close-btn:hover {
+    background: var(--danger-red);
+    border-color: var(--danger-red);
+    transform: rotate(90deg);
+}
+
+.modal-close-btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* Modal Content Grid */
+.modal-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    height: 100%;
+}
+
+@media (min-width: 768px) {
+    .modal-content {
+        grid-template-columns: 1.1fr 1fr;
+    }
+}
+
+/* Modal Media Section (Left) */
+.modal-media-section {
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+}
+
+@media (min-width: 768px) {
+    .modal-media-section {
+        border-bottom: none;
+        border-right: 1px solid var(--border-color);
+    }
+}
+
+.modal-image-wrapper {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    width: 100%;
+    aspect-ratio: 3/2;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.modal-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-fallback {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #18191d;
+    color: var(--text-muted);
+    font-family: var(--font-outfit);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+}
+
+.modal-meta h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.tag-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.gen-tag {
+    font-family: var(--font-outfit);
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: rgba(197, 168, 128, 0.12);
+    border: 1px solid var(--accent-gold);
+    color: var(--accent-gold);
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+}
+
+.sim-tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+}
+
+.modal-desc-note {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+}
+
+.source-link-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    padding: 0.75rem 1.25rem;
+    border-radius: 10px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: var(--transition-smooth);
+}
+
+.source-link-btn:hover {
+    background: var(--text-primary);
+    color: var(--bg-main);
+    border-color: var(--text-primary);
+}
+
+.source-link-btn svg {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+/* Modal Settings Section (Right) - Fujifilm Camera LCD UI Style */
+.modal-settings-section {
+    background: #141517;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.camera-screen-header {
+    background: #0f1012;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #000;
+}
+
+.screen-title {
+    font-family: var(--font-outfit);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+}
+
+/* Battery Indicator Mockup */
+.battery-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.battery-percent {
+    font-family: var(--font-outfit);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.battery-body {
+    width: 18px;
+    height: 10px;
+    border: 1.5px solid var(--text-muted);
+    border-radius: 2px;
+    padding: 1px;
+    position: relative;
+    display: flex;
+}
+
+.battery-body::after {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: 2px;
+    width: 1.5px;
+    height: 4px;
+    background: var(--text-muted);
+    border-radius: 0 1px 1px 0;
+}
+
+.battery-fill {
+    background: var(--accent-teal);
+    width: 100%;
+    height: 100%;
+}
+
+/* Camera Menu Settings List */
+.camera-menu-list {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background: #151619;
+    border-left: 2px solid #08090a;
+}
+
+/* Settings Row Layout */
+.menu-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid #1c1d21;
+    font-family: var(--font-outfit);
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+}
+
+.menu-row.highlighted {
+    background: #b85a1e;
+    color: white;
+}
+
+.menu-row.highlighted .setting-val {
+    color: white;
+}
+
+.setting-key {
+    font-weight: 600;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.menu-row.highlighted .setting-key {
+    color: white;
+}
+
+.setting-val {
+    font-weight: 700;
+    color: var(--accent-gold);
+    text-align: right;
+}
+
+/* Screen Footer */
+.camera-screen-footer {
+    background: #0f1012;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    font-family: var(--font-outfit);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    border-top: 2px solid #000;
+    letter-spacing: 0.05em;
+}
+
+.footer-dot {
+    color: var(--accent-orange);
+    font-size: 1rem;
+}
+
+/* ===== My Recipe Tab & Create Button ===== */
+.tab-btn-my {
+    background: rgba(197, 168, 128, 0.15) !important;
+    border: 1px solid rgba(197, 168, 128, 0.3) !important;
+    color: var(--accent-gold) !important;
+}
+.tab-btn-my.active {
+    background: var(--accent-gold) !important;
+    color: #0b0b0d !important;
+    border-color: var(--accent-gold) !important;
+}
+
+.create-recipe-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, var(--accent-orange), #c04a1a);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-jp);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.create-recipe-btn svg {
+    width: 16px;
+    height: 16px;
+}
+.create-recipe-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(224, 94, 43, 0.4);
+}
+
+/* ===== Create/Edit Recipe Modal ===== */
+.create-modal-container {
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.create-modal-content {
+    padding: 2rem;
+    overflow-y: auto;
+    flex: 1;
+}
+.create-modal-title {
+    font-family: var(--font-outfit);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+.create-form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+.form-half {
+    flex: 1;
+    min-width: 0;
+}
+.form-label {
+    font-family: var(--font-jp);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+}
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    color: var(--text-main);
+    font-family: var(--font-jp);
+    font-size: 0.85rem;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-gold);
+}
+.form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23c5a880' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2rem;
+}
+.form-select option {
+    background: #1a1a20;
+    color: #f0f0f0;
+}
+.form-textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+/* Image Upload Area */
+.image-upload-area {
+    border: 2px dashed rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+    min-height: 100px;
+}
+.image-upload-area:hover,
+.image-upload-area.drag-over {
+    border-color: var(--accent-gold);
+}
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    padding: 1rem 0;
+}
+.upload-placeholder svg {
+    width: 36px;
+    height: 36px;
+    opacity: 0.5;
+}
+.upload-placeholder span {
+    font-size: 0.8rem;
+}
+.upload-preview-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.upload-preview-item {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+.upload-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.upload-preview-remove {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 20px;
+    height: 20px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+/* Form Actions */
+.create-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 2rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+}
+.form-btn-right {
+    display: flex;
+    gap: 0.75rem;
+    margin-left: auto;
+}
+.form-btn {
+    padding: 0.6rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-jp);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.form-btn-cancel {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-sub);
+}
+.form-btn-cancel:hover {
+    background: rgba(255,255,255,0.15);
+}
+.form-btn-save {
+    background: linear-gradient(135deg, var(--accent-gold), #b89a6a);
+    color: #0b0b0d;
+}
+.form-btn-save:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(197,168,128,0.4);
+}
+.form-btn-delete {
+    background: rgba(220,50,50,0.15);
+    color: #e05050;
+}
+.form-btn-delete:hover {
+    background: rgba(220,50,50,0.3);
+}
+
+/* My Recipe Card Badge */
+.card-gen.my-recipe-badge {
+    background: linear-gradient(135deg, var(--accent-gold), #b89a6a) !important;
+    color: #0b0b0d !important;
+}
+
+/* My Recipe Card Edit Button */
+.card-edit-btn {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    width: 32px;
+    height: 32px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    border: none;
+    border-radius: 50%;
+    color: var(--accent-gold);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 2;
+}
+.card-edit-btn svg {
+    width: 16px;
+    height: 16px;
+}
+.card-edit-btn:hover {
+    background: rgba(197,168,128,0.3);
+}
+
+/* My Recipe modal notes */
+.modal-notes {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255,255,255,0.04);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: var(--text-sub);
+    line-height: 1.5;
+}
+
+/* My Recipe gallery in modal */
+.modal-gallery {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+}
+.modal-gallery img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+.modal-gallery img:hover {
+    transform: scale(1.05);
+}
+
+/* Card Upload Photo Button */
+.card-upload-btn {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    width: 32px;
+    height: 32px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    border: none;
+    border-radius: 50%;
+    color: var(--accent-gold);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 2;
+}
+.card-upload-btn svg {
+    width: 16px;
+    height: 16px;
+}
+.card-upload-btn:hover {
+    background: rgba(197,168,128,0.3);
+}
+
+/* Modal Upload Button */
+.modal-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: rgba(197,168,128,0.15);
+    border: 1px solid rgba(197,168,128,0.3);
+    border-radius: 8px;
+    color: var(--accent-gold);
+    font-family: var(--font-jp);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.modal-upload-btn svg {
+    width: 18px;
+    height: 18px;
+}
+.modal-upload-btn:hover {
+    background: rgba(197,168,128,0.25);
+    transform: translateY(-1px);
+}
+
+/* Photo Upload Mode - hide form fields */
+.photo-upload-hidden {
+    display: none !important;
+}
+
+@media (max-width: 480px) {
+    .create-modal-content {
+        padding: 1.25rem;
+    }
+    .create-form-actions {
+        padding: 1rem 1.25rem;
+    }
+    .form-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
