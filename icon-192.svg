@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f0f12"/>
+      <stop offset="100%" stop-color="#1a1a20"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c5a880"/>
+      <stop offset="100%" stop-color="#d4b990"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="40" fill="url(#bg)"/>
+  <rect x="24" y="78" width="144" height="1" fill="url(#accent)" opacity="0.3"/>
+  <rect x="24" y="113" width="144" height="1" fill="url(#accent)" opacity="0.3"/>
+  <text x="96" y="70" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-weight="200" font-size="13" letter-spacing="8" fill="#c5a880" opacity="0.6">FILM</text>
+  <text x="96" y="102" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-weight="600" font-size="22" letter-spacing="6" fill="#f5f5f7">RECIPE</text>
+  <text x="96" y="132" text-anchor="middle" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif" font-weight="200" font-size="13" letter-spacing="8" fill="#c5a880" opacity="0.6">HUB</text>
+  <circle cx="96" cy="156" r="2" fill="#e05e2b" opacity="0.8"/>
+</svg>
