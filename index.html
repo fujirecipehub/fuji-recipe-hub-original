@@ -1250,6 +1250,38 @@ body {
     }
 }
 
+.backup-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    white-space: nowrap;
+}
+.backup-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        padding: 1.5rem 0.5rem;
+    }
+    .recipe-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    .recipe-card {
+        border-radius: 10px;
+    }
+}
+
 </style>
 </head>
 <body>
@@ -1296,6 +1328,20 @@ body {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     <span>マイレシピ作成</span>
+                </button>
+
+                <button onclick="exportBackup()" class="backup-btn" title="バックアップ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+                    </svg>
+                    <span>保存</span>
+                </button>
+
+                <button onclick="importBackup()" class="backup-btn" title="復元">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M16 6l-4-4-4 4M12 2v13" />
+                    </svg>
+                    <span>復元</span>
                 </button>
 
                 <button id="favToggleBtn" class="fav-toggle-btn">
@@ -8914,6 +8960,74 @@ async function loadRecipePhotos() {
         console.error('Error loading recipe photos:', e);
         recipePhotos = {};
     }
+}
+
+// ===== Backup / Restore =====
+async function exportBackup() {
+    try {
+        const data = {
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            favorites: Array.from(favorites),
+            myRecipes: myRecipes,
+            recipePhotos: recipePhotos
+        };
+        const json = JSON.stringify(data);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `fuji-recipe-backup-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        alert('バックアップの作成に失敗しました: ' + e.message);
+    }
+}
+
+function importBackup() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+            if (!data.version || !data.favorites) {
+                alert('無効なバックアップファイルです。');
+                return;
+            }
+            if (!confirm('現在のデータを上書きして復元しますか？')) return;
+
+            favorites = new Set(data.favorites || []);
+            localStorage.setItem('fuji_favorites_original', JSON.stringify(Array.from(favorites)));
+
+            if (data.myRecipes && data.myRecipes.length > 0) {
+                for (const recipe of data.myRecipes) {
+                    await dbPut(recipe);
+                }
+                myRecipes = data.myRecipes;
+            }
+
+            if (data.recipePhotos) {
+                for (const [recipeId, images] of Object.entries(data.recipePhotos)) {
+                    await photoPut(recipeId, images);
+                }
+                recipePhotos = data.recipePhotos;
+            }
+
+            renderCards();
+            updateFavCount();
+            alert('復元が完了しました！');
+        } catch (err) {
+            alert('復元に失敗しました: ' + err.message);
+        }
+    };
+    input.click();
 }
 
 // ===== Image Helpers =====
