@@ -1172,6 +1172,64 @@ body {
     transform: scale(1.05);
 }
 
+/* Card Upload Photo Button */
+.card-upload-btn {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    width: 32px;
+    height: 32px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    border: none;
+    border-radius: 50%;
+    color: var(--accent-gold);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 2;
+}
+.card-upload-btn svg {
+    width: 16px;
+    height: 16px;
+}
+.card-upload-btn:hover {
+    background: rgba(197,168,128,0.3);
+}
+
+/* Modal Upload Button */
+.modal-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: rgba(197,168,128,0.15);
+    border: 1px solid rgba(197,168,128,0.3);
+    border-radius: 8px;
+    color: var(--accent-gold);
+    font-family: var(--font-jp);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.modal-upload-btn svg {
+    width: 18px;
+    height: 18px;
+}
+.modal-upload-btn:hover {
+    background: rgba(197,168,128,0.25);
+    transform: translateY(-1px);
+}
+
+/* Photo Upload Mode - hide form fields */
+.photo-upload-hidden {
+    display: none !important;
+}
+
 @media (max-width: 480px) {
     .create-modal-content {
         padding: 1.25rem;
@@ -8693,6 +8751,7 @@ window.__RECIPES_DATA__ = [
 // Global state
 let allRecipes = [];
 let myRecipes = [];
+let recipePhotos = {};
 let favorites = new Set();
 let currentFilter = 'all';
 let showFavoritesOnly = false;
@@ -8700,9 +8759,10 @@ let editingRecipeId = null;
 let uploadedImages = [];
 let db = null;
 
-const DB_NAME = 'FujiRecipeHub';
-const DB_VERSION = 1;
+const DB_NAME = 'FujiRecipeHubOriginal';
+const DB_VERSION = 2;
 const STORE_NAME = 'myrecipes';
+const PHOTO_STORE = 'recipe_photos';
 
 // DOM Elements
 const searchInput = document.getElementById('searchInput');
@@ -8763,6 +8823,9 @@ function openDB() {
             if (!database.objectStoreNames.contains(STORE_NAME)) {
                 database.createObjectStore(STORE_NAME, { keyPath: 'id' });
             }
+            if (!database.objectStoreNames.contains(PHOTO_STORE)) {
+                database.createObjectStore(PHOTO_STORE, { keyPath: 'recipeId' });
+            }
         };
         request.onsuccess = (e) => {
             db = e.target.result;
@@ -8802,6 +8865,50 @@ function dbDelete(id) {
     });
 }
 
+// ===== Recipe Photos DB =====
+function photoGetAll() {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(PHOTO_STORE, 'readonly');
+        const store = tx.objectStore(PHOTO_STORE);
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = (e) => reject(e.target.error);
+    });
+}
+
+function photoPut(recipeId, images) {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(PHOTO_STORE, 'readwrite');
+        const store = tx.objectStore(PHOTO_STORE);
+        const request = store.put({ recipeId, images });
+        request.onsuccess = () => resolve();
+        request.onerror = (e) => reject(e.target.error);
+    });
+}
+
+function photoDelete(recipeId) {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(PHOTO_STORE, 'readwrite');
+        const store = tx.objectStore(PHOTO_STORE);
+        const request = store.delete(recipeId);
+        request.onsuccess = () => resolve();
+        request.onerror = (e) => reject(e.target.error);
+    });
+}
+
+async function loadRecipePhotos() {
+    try {
+        const all = await photoGetAll();
+        recipePhotos = {};
+        all.forEach(entry => {
+            recipePhotos[entry.recipeId] = entry.images;
+        });
+    } catch (e) {
+        console.error('Error loading recipe photos:', e);
+        recipePhotos = {};
+    }
+}
+
 // ===== Image Helpers =====
 function readFileAsDataURL(file) {
     return new Promise((resolve) => {
@@ -8838,6 +8945,7 @@ async function init() {
     updateFavCounter();
     await openDB();
     await loadMyRecipes();
+    await loadRecipePhotos();
     await fetchRecipes();
     setupEventListeners();
 }
@@ -8929,10 +9037,13 @@ function renderRecipes() {
     recipeGrid.innerHTML = filteredRecipes.map(recipe => {
         const isFav = favorites.has(recipe.id);
         const isMyRecipe = recipe.isMyRecipe;
+        const userPhotos = recipePhotos[recipe.id];
 
         let imageHtml;
         if (isMyRecipe && recipe.images && recipe.images.length > 0) {
             imageHtml = `<img src="${recipe.images[0]}" alt="${recipe.title}" loading="lazy">`;
+        } else if (userPhotos && userPhotos.length > 0) {
+            imageHtml = `<img src="${userPhotos[0]}" alt="${recipe.title}" loading="lazy">`;
         } else if (recipe.imageUrl) {
             imageHtml = `<img src="${recipe.imageUrl}" alt="${recipe.title}" loading="lazy">`;
         } else {
@@ -8943,8 +9054,6 @@ function renderRecipes() {
         const badgeClass = isMyRecipe ? 'card-gen my-recipe-badge' : 'card-gen';
         const baseSim = recipe.settings.film_simulation || 'Unknown Sim';
 
-        const sourceBtn = '';
-
         const editBtn = isMyRecipe ? `
             <button class="card-edit-btn" data-myid="${recipe.id}" title="編集">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -8952,12 +9061,19 @@ function renderRecipes() {
                 </svg>
             </button>` : '';
 
+        const uploadBtn = !isMyRecipe ? `
+            <button class="card-upload-btn" data-id="${recipe.id}" title="作例写真をアップロード">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+            </button>` : '';
+
         return `
             <div class="recipe-card" data-id="${recipe.id}" ${isMyRecipe ? 'data-myrecipe="true"' : ''}>
                 <div class="card-image-area">
                     ${imageHtml}
-                    ${sourceBtn}
                     ${editBtn}
+                    ${uploadBtn}
                     <button class="card-fav-btn ${isFav ? 'active' : ''}" data-id="${recipe.id}">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -8989,7 +9105,7 @@ function renderRecipes() {
 function setupCardClicks() {
     document.querySelectorAll('.recipe-card').forEach(card => {
         card.addEventListener('click', (e) => {
-            if (e.target.closest('.card-fav-btn') || e.target.closest('.card-edit-btn')) return;
+            if (e.target.closest('.card-fav-btn') || e.target.closest('.card-edit-btn') || e.target.closest('.card-upload-btn')) return;
             const recipeId = card.getAttribute('data-id');
             const isMyRecipe = card.getAttribute('data-myrecipe') === 'true';
 
@@ -9019,14 +9135,73 @@ function setupCardClicks() {
             if (recipe) openCreateModal(recipe);
         });
     });
+
+    document.querySelectorAll('.card-upload-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const recipeId = btn.getAttribute('data-id');
+            openPhotoUpload(recipeId);
+        });
+    });
+}
+
+// ===== Photo Upload for Preset Recipes =====
+let photoUploadRecipeId = null;
+
+function openPhotoUpload(recipeId) {
+    photoUploadRecipeId = recipeId;
+    const recipe = allRecipes.find(r => r.id === recipeId);
+    if (!recipe) return;
+
+    uploadedImages = recipePhotos[recipeId] ? [...recipePhotos[recipeId]] : [];
+    createModalTitle.textContent = `作例写真 - ${recipe.title}`;
+    deleteRecipeBtn.style.display = 'none';
+
+    // Hide all form fields except image upload
+    document.querySelectorAll('.create-form-grid .form-section, .create-form-grid .form-row').forEach(el => {
+        if (!el.querySelector('#imageUploadArea') && el.id !== 'imageUploadSection') {
+            el.classList.add('photo-upload-hidden');
+        }
+    });
+
+    renderUploadPreviews();
+    createModal.classList.add('open');
+    createModal.classList.add('photo-upload-mode');
+    document.body.style.overflow = 'hidden';
+}
+
+function closePhotoUpload() {
+    photoUploadRecipeId = null;
+    createModal.classList.remove('photo-upload-mode');
+    document.querySelectorAll('.photo-upload-hidden').forEach(el => {
+        el.classList.remove('photo-upload-hidden');
+    });
+}
+
+async function savePhotoUpload() {
+    if (!photoUploadRecipeId) return;
+    if (uploadedImages.length > 0) {
+        await photoPut(photoUploadRecipeId, uploadedImages);
+    } else {
+        await photoDelete(photoUploadRecipeId);
+    }
+    await loadRecipePhotos();
+    closePhotoUpload();
+    closeCreateModal();
+    renderRecipes();
 }
 
 // Open Detail Modal
 function openModal(recipe) {
     const isMyRecipe = recipe.isMyRecipe;
+    const userPhotos = recipePhotos[recipe.id];
 
     if (isMyRecipe && recipe.images && recipe.images.length > 0) {
         modalImage.src = recipe.images[0];
+        modalImage.style.display = 'block';
+        imageFallback.style.display = 'none';
+    } else if (userPhotos && userPhotos.length > 0) {
+        modalImage.src = userPhotos[0];
         modalImage.style.display = 'block';
         imageFallback.style.display = 'none';
     } else if (recipe.imageUrl) {
@@ -9050,21 +9225,27 @@ function openModal(recipe) {
         modalDescNote.style.display = '';
     }
 
-    // Add gallery for my recipe with multiple images
+    // Clean up previous dynamic elements
     const existingGallery = document.querySelector('.modal-gallery');
     if (existingGallery) existingGallery.remove();
     const existingNotes = document.querySelector('.modal-notes');
     if (existingNotes) existingNotes.remove();
+    const existingUploadBtn = document.querySelector('.modal-upload-btn');
+    if (existingUploadBtn) existingUploadBtn.remove();
 
-    if (isMyRecipe && recipe.images && recipe.images.length > 1) {
+    // Gallery for multiple images (my recipe or user-uploaded photos)
+    const photos = isMyRecipe ? (recipe.images || []) : (userPhotos || []);
+    if (photos.length > 1) {
         const gallery = document.createElement('div');
         gallery.className = 'modal-gallery';
-        recipe.images.forEach(imgSrc => {
+        photos.forEach(imgSrc => {
             const img = document.createElement('img');
             img.src = imgSrc;
             img.alt = 'Sample photo';
             img.addEventListener('click', () => {
                 modalImage.src = imgSrc;
+                modalImage.style.display = 'block';
+                imageFallback.style.display = 'none';
             });
             gallery.appendChild(img);
         });
@@ -9076,6 +9257,23 @@ function openModal(recipe) {
         notesDiv.className = 'modal-notes';
         notesDiv.textContent = recipe.notes;
         document.querySelector('.modal-meta').appendChild(notesDiv);
+    }
+
+    // Add upload button for preset recipes in modal
+    if (!isMyRecipe) {
+        const uploadBtnEl = document.createElement('button');
+        uploadBtnEl.className = 'modal-upload-btn';
+        uploadBtnEl.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span>${photos.length > 0 ? '作例写真を編集' : '作例写真をアップロード'}</span>
+        `;
+        uploadBtnEl.addEventListener('click', () => {
+            closeModal();
+            openPhotoUpload(recipe.id);
+        });
+        document.querySelector('.modal-meta').appendChild(uploadBtnEl);
     }
 
     // Render camera menu
@@ -9146,6 +9344,7 @@ function openCreateModal(existingRecipe = null) {
 }
 
 function closeCreateModal() {
+    closePhotoUpload();
     createModal.classList.remove('open');
     document.body.style.overflow = '';
     editingRecipeId = null;
@@ -9191,6 +9390,12 @@ async function handleImageFiles(files) {
 }
 
 async function saveMyRecipe() {
+    // If in photo upload mode for a preset recipe
+    if (photoUploadRecipeId) {
+        await savePhotoUpload();
+        return;
+    }
+
     const title = document.getElementById('myRecipeTitle').value.trim();
     if (!title) {
         alert('レシピ名を入力してください');
@@ -9255,12 +9460,12 @@ function toggleFavorite(id) {
 
 // Save Favorites to localStorage
 function saveFavorites() {
-    localStorage.setItem('fuji_favorites', JSON.stringify(Array.from(favorites)));
+    localStorage.setItem('fuji_favorites_original', JSON.stringify(Array.from(favorites)));
 }
 
 // Load Favorites from localStorage
 function loadFavorites() {
-    const data = localStorage.getItem('fuji_favorites');
+    const data = localStorage.getItem('fuji_favorites_original');
     if (data) {
         try {
             favorites = new Set(JSON.parse(data));
@@ -9278,14 +9483,12 @@ function updateFavCounter() {
 
 // Event Listeners setup
 function setupEventListeners() {
-    // Real-time search
     searchInput.addEventListener('input', () => {
         const val = searchInput.value;
         clearSearchBtn.style.display = val ? 'flex' : 'none';
         renderRecipes();
     });
 
-    // Clear search
     clearSearchBtn.addEventListener('click', () => {
         searchInput.value = '';
         clearSearchBtn.style.display = 'none';
@@ -9293,7 +9496,6 @@ function setupEventListeners() {
         renderRecipes();
     });
 
-    // Tab buttons
     tabButtons.forEach(btn => {
         btn.addEventListener('click', () => {
             tabButtons.forEach(b => b.classList.remove('active'));
@@ -9303,20 +9505,17 @@ function setupEventListeners() {
         });
     });
 
-    // Favorites filter toggle
     favToggleBtn.addEventListener('click', () => {
         showFavoritesOnly = !showFavoritesOnly;
         favToggleBtn.classList.toggle('active', showFavoritesOnly);
         renderRecipes();
     });
 
-    // Detail Modal Close
     modalClose.addEventListener('click', closeModal);
     recipeModal.addEventListener('click', (e) => {
         if (e.target === recipeModal) closeModal();
     });
 
-    // Create Modal
     createRecipeBtn.addEventListener('click', () => openCreateModal());
     createModalClose.addEventListener('click', closeCreateModal);
     cancelCreateBtn.addEventListener('click', closeCreateModal);
@@ -9326,7 +9525,6 @@ function setupEventListeners() {
         if (e.target === createModal) closeCreateModal();
     });
 
-    // Image upload - click
     imageUploadArea.addEventListener('click', (e) => {
         if (e.target.closest('.upload-preview-remove')) return;
         myRecipeImageInput.click();
@@ -9336,7 +9534,6 @@ function setupEventListeners() {
         myRecipeImageInput.value = '';
     });
 
-    // Image upload - drag & drop
     imageUploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         imageUploadArea.classList.add('drag-over');
@@ -9350,7 +9547,6 @@ function setupEventListeners() {
         handleImageFiles(e.dataTransfer.files);
     });
 
-    // Escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             if (createModal.classList.contains('open')) {
