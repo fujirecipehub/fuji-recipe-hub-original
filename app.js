@@ -159,6 +159,22 @@ async function loadRecipePhotos() {
     }
 }
 
+// ===== Font Size =====
+function setFontSize(size) {
+    document.body.classList.remove('font-small', 'font-large');
+    if (size === 'small') document.body.classList.add('font-small');
+    else if (size === 'large') document.body.classList.add('font-large');
+    localStorage.setItem('fuji_fontsize', size);
+    document.querySelectorAll('.fontsize-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.size === size);
+    });
+}
+
+(function restoreFontSize() {
+    const saved = localStorage.getItem('fuji_fontsize');
+    if (saved && saved !== 'medium') setFontSize(saved);
+})();
+
 // ===== Backup / Restore =====
 async function exportBackup() {
     try {
