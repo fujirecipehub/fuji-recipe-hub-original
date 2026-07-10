@@ -268,7 +268,11 @@ body.font-large { --font-size-base: 18px; }
     border: 1px solid var(--border-color);
     padding: 0.25rem;
     border-radius: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
 }
+.tabs::-webkit-scrollbar { display: none; }
 
 .tab-btn {
     background: transparent;
@@ -281,6 +285,8 @@ body.font-large { --font-size-base: 18px; }
     border-radius: 8px;
     cursor: pointer;
     transition: var(--transition-smooth);
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .tab-btn.active {
@@ -952,6 +958,19 @@ body.font-large { --font-size-base: 18px; }
     font-size: 1rem;
 }
 
+.exif-notice {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 8px;
+    color: #065f46;
+    font-size: 0.82rem;
+    transition: opacity 0.5s;
+}
+
 /* ===== My Recipe Tab & Create Button ===== */
 .tab-btn-my {
     background: rgba(139, 105, 20, 0.08) !important;
@@ -1380,6 +1399,7 @@ body.font-large { --font-size-base: 18px; }
             <div class="filter-controls">
                 <div class="tabs">
                     <button class="tab-btn active" data-gen="all">ALL</button>
+                    <button class="tab-btn tab-btn-my" data-gen="myrecipe">MY</button>
                     <button class="tab-btn" data-gen="X-Trans I">I</button>
                     <button class="tab-btn" data-gen="X-Trans II">II</button>
                     <button class="tab-btn" data-gen="X-Trans III">III</button>
@@ -1387,7 +1407,6 @@ body.font-large { --font-size-base: 18px; }
                     <button class="tab-btn" data-gen="X-Trans V">V</button>
                     <button class="tab-btn" data-gen="Bayer">Bayer</button>
                     <button class="tab-btn" data-gen="GFX">GFX</button>
-                    <button class="tab-btn tab-btn-my" data-gen="myrecipe">MY</button>
                 </div>
 
                 <button id="createRecipeBtn" class="create-recipe-btn">
@@ -9588,10 +9607,437 @@ function renderUploadPreviews() {
     });
 }
 
+// ===== EXIF Parser for Fujifilm =====
+// Tag mappings based on ExifTool FujiFilm.pm and fuji-recipes library
+function readFileAsArrayBuffer(file) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+function parseExifFromFile(file) {
+    return readFileAsArrayBuffer(file).then(buffer => {
+        try {
+            return parseFujifilmExif(new DataView(buffer));
+        } catch (e) {
+            console.warn('EXIF parse failed:', e);
+            return null;
+        }
+    });
+}
+
+function parseFujifilmExif(view) {
+    if (view.getUint16(0) !== 0xFFD8) return null;
+    let offset = 2;
+    while (offset < view.byteLength - 1) {
+        const marker = view.getUint16(offset);
+        if (marker === 0xFFE1) {
+            const length = view.getUint16(offset + 2);
+            const exifStart = offset + 4;
+            const sig = String.fromCharCode(
+                view.getUint8(exifStart), view.getUint8(exifStart+1),
+                view.getUint8(exifStart+2), view.getUint8(exifStart+3)
+            );
+            if (sig === 'Exif') {
+                return parseExifBlock(view, exifStart + 6, length - 6);
+            }
+        }
+        if ((marker & 0xFF00) !== 0xFF00) break;
+        offset += 2 + view.getUint16(offset + 2);
+    }
+    return null;
+}
+
+function parseExifBlock(view, tiffStart, maxLen) {
+    const bo = view.getUint16(tiffStart) === 0x4D4D;
+    const le = !bo;
+    const g16 = (o) => view.getUint16(tiffStart + o, le);
+    const g32 = (o) => view.getUint32(tiffStart + o, le);
+
+    if (g16(2) !== 0x002A) return null;
+    const ifd0off = g32(4);
+
+    const result = { make: '', model: '' };
+    let exifIFDOff = 0;
+
+    const ifd0count = g16(ifd0off);
+    for (let i = 0; i < ifd0count; i++) {
+        const entryOff = ifd0off + 2 + i * 12;
+        const tag = g16(entryOff);
+        const type = g16(entryOff + 2);
+        const count = g32(entryOff + 4);
+        const valOff = g32(entryOff + 8);
+        if (tag === 0x010F) result.make = readExifString(view, tiffStart, type, count, valOff, entryOff + 8, le);
+        if (tag === 0x0110) result.model = readExifString(view, tiffStart, type, count, valOff, entryOff + 8, le);
+        if (tag === 0x8769) exifIFDOff = valOff;
+    }
+
+    if (!result.make.toUpperCase().includes('FUJI')) return result;
+
+    let makerNoteOff = 0;
+    let isoVal = '';
+    let exposureComp = '';
+    if (exifIFDOff) {
+        const cnt = g16(exifIFDOff);
+        for (let i = 0; i < cnt; i++) {
+            const eo = exifIFDOff + 2 + i * 12;
+            const tag = g16(eo);
+            const type = g16(eo + 2);
+            const count = g32(eo + 4);
+            const vo = g32(eo + 8);
+            if (tag === 0x927C) makerNoteOff = vo;
+            if (tag === 0x8827) isoVal = type === 3 ? '' + g16(eo + 8) : '' + g32(eo + 8);
+            if (tag === 0x9204) {
+                const num = view.getInt32(tiffStart + vo, le);
+                const den = view.getInt32(tiffStart + vo + 4, le);
+                if (den) {
+                    const ev = num / den;
+                    if (ev === 0) exposureComp = '0';
+                    else {
+                        const sign = ev > 0 ? '+' : '';
+                        const abs = Math.abs(ev);
+                        const whole = Math.floor(abs);
+                        const frac = abs - whole;
+                        if (frac < 0.08) exposureComp = sign + whole;
+                        else if (Math.abs(frac - 1/3) < 0.08) exposureComp = sign + (whole ? whole + ' ' : '') + '1/3';
+                        else if (Math.abs(frac - 2/3) < 0.08) exposureComp = sign + (whole ? whole + ' ' : '') + '2/3';
+                        else if (Math.abs(frac - 0.5) < 0.08) exposureComp = sign + (whole ? whole + ' ' : '') + '1/2';
+                        else exposureComp = sign + ev.toFixed(1);
+                    }
+                }
+            }
+        }
+    }
+
+    result.iso = isoVal;
+    result.exposureComp = exposureComp;
+
+    if (!makerNoteOff) return result;
+
+    try {
+        const mnBase = tiffStart + makerNoteOff;
+        const mnSig = String.fromCharCode(
+            view.getUint8(mnBase), view.getUint8(mnBase+1), view.getUint8(mnBase+2), view.getUint8(mnBase+3),
+            view.getUint8(mnBase+4), view.getUint8(mnBase+5), view.getUint8(mnBase+6), view.getUint8(mnBase+7)
+        );
+        if (mnSig !== 'FUJIFILM') return result;
+
+        const mnOff = (o) => mnBase + o;
+        const fg16 = (o) => view.getUint16(mnOff(o), true);
+        const fg32 = (o) => view.getUint32(mnOff(o), true);
+        const fi32 = (o) => view.getInt32(mnOff(o), true);
+
+        const ifdOff = fg32(8);
+        const tagCount = fg16(ifdOff);
+
+        const fujiTags = {};
+        const fujiRawOffsets = {};
+        for (let i = 0; i < tagCount; i++) {
+            const te = ifdOff + 2 + i * 12;
+            if (te + 12 > view.byteLength - mnBase) break;
+            const ftag = fg16(te);
+            const ftype = fg16(te + 2);
+            const fcount = fg32(te + 4);
+            let fval;
+            if (ftype === 3) fval = fg16(te + 8);
+            else if (ftype === 4) fval = fg32(te + 8);
+            else if (ftype === 9) fval = fi32(te + 8);
+            else fval = fg32(te + 8);
+            fujiTags[ftag] = fval;
+            fujiRawOffsets[ftag] = te + 8;
+        }
+
+        // Film Simulation (0x1401)
+        const filmSimMap = {
+            0x0: 'Provia/STD', 0x100: 'Provia/STD',
+            0x110: 'Astia/Soft', 0x120: 'Astia/Soft',
+            0x200: 'Velvia/Vivid', 0x300: 'Velvia/Vivid', 0x400: 'Velvia/Vivid',
+            0x500: 'PRO Neg. Std', 0x501: 'PRO Neg. Hi',
+            0x600: 'Classic Chrome',
+            0x700: 'Eterna',
+            0x800: 'Classic Negative',
+            0x900: 'Eterna Bleach Bypass',
+            0xA00: 'Nostalgic Negative',
+            0xB00: 'Reala Ace',
+        };
+        if (fujiTags[0x1401] !== undefined) {
+            result.filmSimulation = filmSimMap[fujiTags[0x1401]] || '';
+        }
+
+        // Monochrome/Acros override via Saturation (0x1003)
+        if (fujiTags[0x1003] !== undefined) {
+            const sat = fujiTags[0x1003];
+            const monoMap = {
+                0x300: 'Monochrome', 0x301: 'Monochrome+R', 0x302: 'Monochrome+Ye', 0x303: 'Monochrome+G',
+                0x310: 'Sepia',
+                0x500: 'Acros', 0x501: 'Acros+R', 0x502: 'Acros+Ye', 0x503: 'Acros+G'
+            };
+            if (monoMap[sat]) result.filmSimulation = monoMap[sat];
+        }
+
+        // White Balance (0x1002)
+        const wbMap = {
+            0x0: 'Auto', 0x1: 'Auto (white priority)', 0x2: 'Auto (ambiance priority)',
+            0x100: 'Daylight', 0x200: 'Cloudy',
+            0x300: 'Daylight Fluorescent', 0x301: 'Day White Fluorescent',
+            0x302: 'White Fluorescent', 0x303: 'Warm White Fluorescent',
+            0x304: 'Living Room Warm White Fluorescent',
+            0x400: 'Incandescent', 0x500: 'Flash', 0x600: 'Underwater',
+            0xF00: 'Custom', 0xF01: 'Custom2', 0xF02: 'Custom3',
+            0xF03: 'Custom4', 0xF04: 'Custom5',
+            0xFF0: 'Kelvin'
+        };
+        if (fujiTags[0x1002] !== undefined) {
+            result.whiteBalance = wbMap[fujiTags[0x1002]] || 'Auto';
+            if (fujiTags[0x1002] === 0xFF0 && fujiTags[0x1005] !== undefined) {
+                result.whiteBalance = fujiTags[0x1005] + 'K';
+            }
+        }
+
+        // WB Fine Tune (0x100A) — value is offset to two Int32LE, divide by 10
+        if (fujiTags[0x100A] !== undefined) {
+            try {
+                const wbftOffset = fujiTags[0x100A];
+                const redRaw = fi32(wbftOffset);
+                const blueRaw = fi32(wbftOffset + 4);
+                const red = redRaw / 10;
+                const blue = blueRaw / 10;
+                if (red >= -9 && red <= 9 && blue >= -9 && blue <= 9) {
+                    const parts = [];
+                    if (red !== 0) parts.push((red > 0 ? '+' : '') + red + ' Red');
+                    if (blue !== 0) parts.push((blue > 0 ? '+' : '') + blue + ' Blue');
+                    if (parts.length) result.wbShift = parts.join(', ');
+                }
+            } catch (e) {}
+        }
+
+        // Highlight Tone (0x1041) / Shadow Tone (0x1040) — values in steps of 8
+        const toneMap = {
+            '-64': '+4', '-56': '+3.5', '-48': '+3', '-40': '+2.5',
+            '-32': '+2', '-24': '+1.5', '-16': '+1', '-8': '+0.5',
+            '0': '0',
+            '8': '-0.5', '16': '-1', '24': '-1.5', '32': '-2'
+        };
+        if (fujiTags[0x1041] !== undefined) {
+            result.highlightTone = toneMap['' + fujiTags[0x1041]] || '' + fujiTags[0x1041];
+        }
+        if (fujiTags[0x1040] !== undefined) {
+            result.shadowTone = toneMap['' + fujiTags[0x1040]] || '' + fujiTags[0x1040];
+        }
+
+        // Color / Saturation (0x1003) — skip if monochrome/acros
+        if (fujiTags[0x1003] !== undefined) {
+            const sat = fujiTags[0x1003];
+            const satMap = {
+                0x0: '0', 0x80: '+1', 0x100: '+2', 0xC0: '+3', 0xE0: '+4',
+                0x180: '-1', 0x400: '-2', 0x4C0: '-3', 0x4E0: '-4'
+            };
+            const isMono = (sat >= 0x300 && sat <= 0x310) || (sat >= 0x500 && sat <= 0x503) || sat === 0x200 || sat === 0x8000;
+            if (!isMono && satMap[sat] !== undefined) {
+                result.color = satMap[sat];
+            }
+        }
+
+        // Sharpness (0x1001)
+        if (fujiTags[0x1001] !== undefined) {
+            const sharpMap = {
+                0x0: '-4', 0x1: '-3', 0x2: '-2', 0x3: '0', 0x4: '+2',
+                0x5: '+3', 0x6: '+4', 0x82: '-1', 0x84: '+1'
+            };
+            result.sharpness = sharpMap[fujiTags[0x1001]];
+        }
+
+        // Noise Reduction (0x100E)
+        if (fujiTags[0x100E] !== undefined) {
+            const nrMap = {
+                0x0: '0', 0x100: '+2', 0x180: '+1', 0x1C0: '+3', 0x1E0: '+4',
+                0x200: '-2', 0x280: '-1', 0x2C0: '-3', 0x2E0: '-4'
+            };
+            result.noiseReduction = nrMap[fujiTags[0x100E]];
+        }
+
+        // Dynamic Range: 0x1402 (setting) + 0x1403 (development range)
+        if (fujiTags[0x1402] !== undefined) {
+            const drSetting = fujiTags[0x1402];
+            if (drSetting === 0) {
+                result.dynamicRange = 'DR-Auto';
+            } else if (drSetting === 1 && fujiTags[0x1403] !== undefined) {
+                result.dynamicRange = 'DR' + fujiTags[0x1403];
+            } else {
+                const drMap = { 0x100: 'DR100', 0x200: 'DR200', 0x201: 'DR400' };
+                result.dynamicRange = drMap[drSetting] || '';
+            }
+        }
+
+        // Grain Effect: 0x1047 = Roughness, 0x104C = Size
+        if (fujiTags[0x1047] !== undefined) {
+            const roughMap = { 0: 'Off', 0x20: 'Weak', 0x40: 'Strong' };
+            const roughness = roughMap[fujiTags[0x1047]];
+            if (roughness === 'Off') {
+                result.grainEffect = 'Off';
+            } else if (roughness && fujiTags[0x104C] !== undefined) {
+                const sizeMap = { 0: 'Off', 0x10: 'Small', 0x20: 'Large' };
+                const size = sizeMap[fujiTags[0x104C]] || 'Small';
+                result.grainEffect = roughness + ', ' + size;
+            } else if (roughness) {
+                result.grainEffect = roughness;
+            }
+        }
+
+        // Color Chrome Effect (0x1048)
+        if (fujiTags[0x1048] !== undefined) {
+            const cceMap = { 0: 'Off', 0x20: 'Weak', 0x40: 'Strong' };
+            if (cceMap[fujiTags[0x1048]] !== undefined) {
+                result.colorChromeEffect = cceMap[fujiTags[0x1048]];
+            }
+        }
+
+        // Color Chrome FX Blue (0x104E)
+        if (fujiTags[0x104E] !== undefined) {
+            const ccbMap = { 0: 'Off', 0x20: 'Weak', 0x40: 'Strong' };
+            if (ccbMap[fujiTags[0x104E]] !== undefined) {
+                result.colorChromeFxBlue = ccbMap[fujiTags[0x104E]];
+            }
+        }
+
+        // Clarity (0x100F) — values in thousands
+        if (fujiTags[0x100F] !== undefined) {
+            const cv = fujiTags[0x100F];
+            const clVal = Math.round(cv / 1000);
+            if (clVal >= -5 && clVal <= 5) {
+                result.clarity = clVal === 0 ? '0' : (clVal > 0 ? '+' + clVal : '' + clVal);
+            }
+        }
+
+    } catch (e) {
+        console.warn('MakerNote parse error:', e);
+    }
+
+    return result;
+}
+
+function readExifString(view, tiffStart, type, count, valOff, inlineOff, littleEndian) {
+    if (type !== 2) return '';
+    const start = count > 4 ? tiffStart + valOff : inlineOff;
+    let str = '';
+    for (let i = 0; i < count - 1; i++) {
+        const c = view.getUint8(start + i);
+        if (c === 0) break;
+        str += String.fromCharCode(c);
+    }
+    return str.trim();
+}
+
+function applyExifToForm(exif) {
+    if (!exif) return false;
+    let applied = false;
+
+    if (exif.filmSimulation) {
+        const sel = document.getElementById('myFilmSim');
+        for (const opt of sel.options) {
+            if (opt.text === exif.filmSimulation || opt.value === exif.filmSimulation) {
+                sel.value = opt.value;
+                applied = true;
+                break;
+            }
+        }
+    }
+    if (exif.dynamicRange) {
+        setSelectValue('myDR', exif.dynamicRange);
+        applied = true;
+    }
+    if (exif.grainEffect) {
+        setSelectValue('myGrain', exif.grainEffect);
+        applied = true;
+    }
+    if (exif.colorChromeEffect) {
+        setSelectValue('myCCE', exif.colorChromeEffect);
+        applied = true;
+    }
+    if (exif.colorChromeFxBlue) {
+        setSelectValue('myCCB', exif.colorChromeFxBlue);
+        applied = true;
+    }
+
+    // White balance: combine WB name + shift
+    if (exif.whiteBalance) {
+        let wbStr = exif.whiteBalance;
+        if (exif.wbShift) wbStr += ', ' + exif.wbShift;
+        document.getElementById('myWB').value = wbStr;
+        applied = true;
+    }
+
+    if (exif.highlightTone !== undefined) {
+        document.getElementById('myHighlight').value = exif.highlightTone;
+        applied = true;
+    }
+    if (exif.shadowTone !== undefined) {
+        document.getElementById('myShadow').value = exif.shadowTone;
+        applied = true;
+    }
+    if (exif.color !== undefined) {
+        document.getElementById('myColor').value = exif.color;
+        applied = true;
+    }
+    if (exif.sharpness !== undefined) {
+        document.getElementById('mySharpness').value = exif.sharpness;
+        applied = true;
+    }
+    if (exif.noiseReduction !== undefined) {
+        document.getElementById('myNR').value = exif.noiseReduction;
+        applied = true;
+    }
+    if (exif.clarity !== undefined) {
+        document.getElementById('myClarity').value = exif.clarity;
+        applied = true;
+    }
+    if (exif.exposureComp) {
+        document.getElementById('myExposure').value = exif.exposureComp;
+        applied = true;
+    }
+
+    return applied;
+}
+
+function setSelectValue(id, val) {
+    const sel = document.getElementById(id);
+    for (const opt of sel.options) {
+        if (opt.text === val || opt.value === val) {
+            sel.value = opt.value;
+            return;
+        }
+    }
+}
+
+function showExifNotice(exif) {
+    const existing = document.querySelector('.exif-notice');
+    if (existing) existing.remove();
+    const notice = document.createElement('div');
+    notice.className = 'exif-notice';
+    const model = exif.model || 'FUJIFILM';
+    notice.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:16px;height:16px;flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' +
+        '<span>' + model + ' の撮影データから設定を自動入力しました</span>';
+    const form = document.querySelector('.create-form-grid');
+    form.insertBefore(notice, form.children[2]);
+    setTimeout(() => { if (notice.parentNode) notice.style.opacity = '0'; setTimeout(() => notice.remove(), 500); }, 8000);
+}
+
 async function handleImageFiles(files) {
+    let exifApplied = false;
     for (const file of files) {
         if (!file.type.startsWith('image/')) continue;
         if (uploadedImages.length >= 5) break;
+        if (!photoUploadRecipeId && !exifApplied && uploadedImages.length === 0 && file.type === 'image/jpeg') {
+            try {
+                const exif = await parseExifFromFile(file);
+                if (exif && applyExifToForm(exif)) {
+                    exifApplied = true;
+                    showExifNotice(exif);
+                }
+            } catch (e) { console.warn('EXIF extraction failed:', e); }
+        }
         const dataUrl = await readFileAsDataURL(file);
         const compressed = await compressImage(dataUrl);
         uploadedImages.push(compressed);
