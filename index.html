@@ -9796,19 +9796,28 @@ function parseExifBlock(view, tiffStart, maxLen) {
             }
         }
 
-        // WB Fine Tune (0x100A) — value is offset to two Int32LE, divide by 10
+        // WB Fine Tune (0x100A) — value is offset to two Int32LE (Red, Blue)
+        // Per ExifTool: newer cameras store shift x20 (e.g. +3 -> 60)
         if (fujiTags[0x100A] !== undefined) {
             try {
                 const wbftOffset = fujiTags[0x100A];
                 const redRaw = fi32(wbftOffset);
                 const blueRaw = fi32(wbftOffset + 4);
-                const red = redRaw / 10;
-                const blue = blueRaw / 10;
-                if (red >= -9 && red <= 9 && blue >= -9 && blue <= 9) {
+                console.log('[EXIF] WBFineTune raw: R=' + redRaw + ' B=' + blueRaw);
+                let red = null, blue = null;
+                for (const d of [20, 10, 1]) {
+                    const r = redRaw / d, b = blueRaw / d;
+                    if (Number.isInteger(r) && Number.isInteger(b) &&
+                        r >= -9 && r <= 9 && b >= -9 && b <= 9) {
+                        red = r; blue = b;
+                        break;
+                    }
+                }
+                if (red !== null && (red !== 0 || blue !== 0)) {
                     const parts = [];
                     if (red !== 0) parts.push((red > 0 ? '+' : '') + red + ' Red');
                     if (blue !== 0) parts.push((blue > 0 ? '+' : '') + blue + ' Blue');
-                    if (parts.length) result.wbShift = parts.join(', ');
+                    result.wbShift = parts.join(', ');
                 }
             } catch (e) {}
         }
