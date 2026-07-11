@@ -9627,6 +9627,12 @@ function openCreateModal(existingRecipe = null) {
     document.getElementById('myExposure').value = existingRecipe ? (existingRecipe.settings.exposure_compensation || '') : '';
     document.getElementById('myNotes').value = existingRecipe ? (existingRecipe.notes || '') : '';
 
+    const meta = existingRecipe && existingRecipe.meta ? existingRecipe.meta : {};
+    if (meta.camera) createModal.dataset.camera = meta.camera;
+    else delete createModal.dataset.camera;
+    if (meta.shotDate) createModal.dataset.shotDate = meta.shotDate;
+    else delete createModal.dataset.shotDate;
+
     renderUploadPreviews();
     createModal.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -9638,6 +9644,8 @@ function closeCreateModal() {
     document.body.style.overflow = '';
     editingRecipeId = null;
     uploadedImages = [];
+    delete createModal.dataset.camera;
+    delete createModal.dataset.shotDate;
 }
 
 const IMAGE_MAX = 3;
@@ -9740,6 +9748,7 @@ function parseExifBlock(view, tiffStart, maxLen) {
     let makerNoteOff = 0;
     let isoVal = '';
     let exposureComp = '';
+    let dateTimeOriginal = '';
     if (exifIFDOff) {
         const cnt = g16(exifIFDOff);
         for (let i = 0; i < cnt; i++) {
@@ -9750,6 +9759,7 @@ function parseExifBlock(view, tiffStart, maxLen) {
             const vo = g32(eo + 8);
             if (tag === 0x927C) makerNoteOff = vo;
             if (tag === 0x8827) isoVal = type === 3 ? '' + g16(eo + 8) : '' + g32(eo + 8);
+            if (tag === 0x9003) dateTimeOriginal = readExifString(view, tiffStart, type, count, vo, eo + 8, le);
             if (tag === 0x9204) {
                 const num = view.getInt32(tiffStart + vo, le);
                 const den = view.getInt32(tiffStart + vo + 4, le);
@@ -9774,6 +9784,7 @@ function parseExifBlock(view, tiffStart, maxLen) {
 
     result.iso = isoVal;
     result.exposureComp = exposureComp;
+    result.dateTimeOriginal = dateTimeOriginal;
 
     if (!makerNoteOff) return result;
 
@@ -10026,6 +10037,15 @@ function applyExifToForm(exif) {
     if (!exif) return false;
     let applied = false;
 
+    if (exif.model) {
+        createModal.dataset.camera = exif.model;
+        applied = true;
+    }
+    if (exif.dateTimeOriginal) {
+        createModal.dataset.shotDate = exif.dateTimeOriginal;
+        applied = true;
+    }
+
     if (exif.filmSimulation) {
         const sel = document.getElementById('myFilmSim');
         for (const opt of sel.options) {
@@ -10170,6 +10190,10 @@ async function saveMyRecipe() {
         },
         images: uploadedImages,
         notes: document.getElementById('myNotes').value.trim(),
+        meta: {
+            camera: createModal.dataset.camera || '',
+            shotDate: createModal.dataset.shotDate || ''
+        },
         createdAt: editingRecipeId
             ? (myRecipes.find(r => r.id === editingRecipeId)?.createdAt || Date.now())
             : Date.now(),
@@ -10197,25 +10221,41 @@ async function deleteMyRecipe() {
 function generateRecipeName() {
     const film = document.getElementById('myFilmSim').value.trim();
     const wb = document.getElementById('myWB').value.trim();
+    const camera = createModal.dataset.camera || '';
+    const shotDate = createModal.dataset.shotDate || '';
+
     const parts = [];
     if (film) parts.push(film);
     if (wb) {
         const wbBase = wb.split(',')[0].trim();
         if (wbBase && wbBase !== film) parts.push(wbBase);
     }
-    const d = new Date();
-    const dateStr = String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+    if (camera) parts.push(camera);
+
+    let dateStr = '';
+    if (shotDate) {
+        const m = shotDate.match(/^(\d{4}):(\d{2}):(\d{2})/);
+        if (m) dateStr = m[1] + '/' + m[2] + '/' + m[3];
+    }
+    if (!dateStr) {
+        const d = new Date();
+        dateStr = d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+    }
+
     const base = parts.length ? parts.join(' × ') : 'My Recipe';
     document.getElementById('myRecipeTitle').value = base + ' — ' + dateStr;
 }
 
-function buildRecipeShareText() {
+async function renderRecipeShareCard() {
     const title = document.getElementById('myRecipeTitle').value.trim() || 'My Recipe';
+    const camera = createModal.dataset.camera || '';
+    const shotDate = (createModal.dataset.shotDate || '').replace(/^(\d{4}):(\d{2}):(\d{2}).*/, '$1/$2/$3');
+    const notes = document.getElementById('myNotes').value.trim();
     const kv = [
         ['Film Simulation', document.getElementById('myFilmSim').value],
         ['Dynamic Range', document.getElementById('myDR').value],
         ['Grain Effect', document.getElementById('myGrain').value],
-        ['Color Chrome Effect', document.getElementById('myCCE').value],
+        ['Color Chrome', document.getElementById('myCCE').value],
         ['Color Chrome FX Blue', document.getElementById('myCCB').value],
         ['White Balance', document.getElementById('myWB').value],
         ['Highlight Tone', document.getElementById('myHighlight').value],
@@ -10225,39 +10265,203 @@ function buildRecipeShareText() {
         ['Noise Reduction', document.getElementById('myNR').value],
         ['Clarity', document.getElementById('myClarity').value],
         ['Exposure Comp.', document.getElementById('myExposure').value],
-    ];
-    const lines = ['📷 ' + title, '─────────'];
-    for (const [k, v] of kv) if (v && v.trim()) lines.push(k + ': ' + v);
-    const notes = document.getElementById('myNotes').value.trim();
-    if (notes) { lines.push('─────────'); lines.push(notes); }
-    lines.push('');
-    lines.push('#FUJIFILM #FilmSimulation');
-    return lines.join('\n');
+    ].filter(([k,v]) => v && v.toString().trim());
+
+    const mainImg = uploadedImages[0];
+    let img = null;
+    if (mainImg) {
+        img = await new Promise((res, rej) => {
+            const im = new Image();
+            im.onload = () => res(im);
+            im.onerror = rej;
+            im.src = mainImg;
+        }).catch(() => null);
+    }
+
+    const W = 1080;
+    const pad = 56;
+    const gold = '#8b6914';
+    const bgColor = '#faf8f4';
+    const textColor = '#1a1a1a';
+    const subColor = '#7a6d5a';
+    const borderColor = '#e6dfd0';
+
+    const headerH = 160;
+    let photoH = 0;
+    if (img) {
+        const targetW = W - pad * 2;
+        photoH = Math.min(720, Math.round(targetW * (img.height / img.width)));
+    }
+    const rowH = 62;
+    const rows = Math.ceil(kv.length / 2);
+    const settingsH = 60 + rows * rowH + 30;
+    let notesLines = [];
+    const notesFontSize = 24;
+    if (notes) {
+        const maxChars = 44;
+        for (const line of notes.split('\n')) {
+            let l = line;
+            while (l.length > maxChars) {
+                notesLines.push(l.slice(0, maxChars));
+                l = l.slice(maxChars);
+            }
+            notesLines.push(l);
+        }
+    }
+    const notesH = notesLines.length ? 60 + notesLines.length * 34 + 20 : 0;
+    const footerH = 90;
+    const H = headerH + photoH + settingsH + notesH + footerH + pad * 2;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, W, H);
+
+    let y = pad;
+    ctx.fillStyle = gold;
+    ctx.fillRect(pad, y, 60, 4);
+    y += 22;
+
+    ctx.fillStyle = textColor;
+    ctx.font = '600 46px system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif';
+    ctx.textBaseline = 'top';
+    const drawWrapped = (text, x, y, maxW, lineH) => {
+        const chars = text.split('');
+        let line = '';
+        for (const ch of chars) {
+            const test = line + ch;
+            if (ctx.measureText(test).width > maxW) {
+                ctx.fillText(line, x, y);
+                y += lineH;
+                line = ch;
+            } else {
+                line = test;
+            }
+        }
+        if (line) { ctx.fillText(line, x, y); y += lineH; }
+        return y;
+    };
+    y = drawWrapped(title, pad, y, W - pad * 2, 54);
+    y += 8;
+
+    ctx.fillStyle = subColor;
+    ctx.font = '400 22px system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif';
+    const metaBits = [];
+    if (camera) metaBits.push(camera);
+    if (shotDate) metaBits.push(shotDate);
+    if (metaBits.length) {
+        ctx.fillText(metaBits.join('  •  '), pad, y);
+        y += 40;
+    } else {
+        y += 20;
+    }
+
+    if (img && photoH) {
+        const targetW = W - pad * 2;
+        ctx.save();
+        const r = 12;
+        const px = pad, py = y, pw = targetW, ph = photoH;
+        ctx.beginPath();
+        ctx.moveTo(px + r, py);
+        ctx.arcTo(px + pw, py, px + pw, py + ph, r);
+        ctx.arcTo(px + pw, py + ph, px, py + ph, r);
+        ctx.arcTo(px, py + ph, px, py, r);
+        ctx.arcTo(px, py, px + pw, py, r);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(img, px, py, pw, ph);
+        ctx.restore();
+        y += photoH + 32;
+    }
+
+    ctx.fillStyle = gold;
+    ctx.font = '600 20px system-ui, -apple-system, "Segoe UI", sans-serif';
+    ctx.fillText('SETTINGS', pad, y);
+    y += 34;
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke();
+    y += 18;
+
+    const colW = (W - pad * 2) / 2;
+    for (let i = 0; i < kv.length; i++) {
+        const col = i % 2;
+        const row = Math.floor(i / 2);
+        const cx = pad + col * colW;
+        const cy = y + row * rowH;
+        ctx.fillStyle = subColor;
+        ctx.font = '500 16px system-ui, -apple-system, sans-serif';
+        ctx.fillText(kv[i][0].toUpperCase(), cx, cy);
+        ctx.fillStyle = textColor;
+        ctx.font = '600 22px system-ui, -apple-system, sans-serif';
+        let val = kv[i][1].toString();
+        const maxW = colW - 20;
+        while (ctx.measureText(val).width > maxW && val.length > 3) val = val.slice(0, -1);
+        if (val !== kv[i][1].toString()) val = val.slice(0, -1) + '…';
+        ctx.fillText(val, cx, cy + 24);
+    }
+    y += rows * rowH + 20;
+
+    if (notesLines.length) {
+        ctx.fillStyle = gold;
+        ctx.font = '600 20px system-ui, sans-serif';
+        ctx.fillText('NOTES', pad, y);
+        y += 34;
+        ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke();
+        y += 18;
+        ctx.fillStyle = textColor;
+        ctx.font = '400 ' + notesFontSize + 'px system-ui, sans-serif';
+        for (const line of notesLines) {
+            ctx.fillText(line, pad, y);
+            y += 34;
+        }
+        y += 20;
+    }
+
+    ctx.fillStyle = subColor;
+    ctx.font = '400 18px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('FUJIFILM Film Simulation Recipe Hub', W / 2, H - pad - 40);
+    ctx.fillStyle = gold;
+    ctx.font = '600 16px system-ui, sans-serif';
+    ctx.fillText('#FUJIFILM  #FilmSimulation', W / 2, H - pad - 16);
+    ctx.textAlign = 'left';
+
+    return new Promise((resolve) => canvas.toBlob(resolve, 'image/png', 0.92));
 }
 
 async function shareMyRecipe() {
-    const text = buildRecipeShareText();
     const title = document.getElementById('myRecipeTitle').value.trim() || 'My Recipe';
-    if (navigator.share) {
+    let blob;
+    try {
+        blob = await renderRecipeShareCard();
+    } catch (e) {
+        console.warn('card render failed', e);
+    }
+    if (!blob) {
+        alert('共有画像の生成に失敗しました');
+        return;
+    }
+    const filename = title.replace(/[\\/:*?"<>|]/g, '_').slice(0, 60) + '.png';
+    const file = new File([blob], filename, { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
-            await navigator.share({ title: title, text: text });
+            await navigator.share({ files: [file], title: title, text: title });
             return;
         } catch (e) {
             if (e && e.name === 'AbortError') return;
         }
     }
-    try {
-        await navigator.clipboard.writeText(text);
-        alert('レシピをクリップボードにコピーしました');
-    } catch (e) {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        try { document.execCommand('copy'); alert('レシピをクリップボードにコピーしました'); }
-        catch (err) { alert('コピーに失敗しました'); }
-        ta.remove();
-    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 // Toggle Favorite Status
