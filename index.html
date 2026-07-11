@@ -9916,19 +9916,18 @@ function parseExifBlock(view, tiffStart, maxLen) {
             }
         }
 
-        // Highlight Tone (0x1041) / Shadow Tone (0x1040) — values in steps of 8
-        const toneMap = {
-            '-64': '+4', '-56': '+3.5', '-48': '+3', '-40': '+2.5',
-            '-32': '+2', '-24': '+1.5', '-16': '+1', '-8': '+0.5',
-            '0': '0',
-            '8': '-0.5', '16': '-1', '24': '-1.5', '32': '-2'
-        };
-        if (fujiTags[0x1041] !== undefined) {
-            result.highlightTone = toneMap['' + fujiTags[0x1041]] || '' + fujiTags[0x1041];
+        // Highlight/Shadow Tone — ExifTool formula: display = -raw / 16
+        function formatFujiTone(v) {
+            if (v == null) return undefined;
+            const disp = -v / 16;
+            const rounded = Math.round(disp * 2) / 2;
+            if (rounded < -8 || rounded > 8) return undefined;
+            if (rounded === 0) return '0';
+            const sign = rounded > 0 ? '+' : '';
+            return sign + (rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(1));
         }
-        if (fujiTags[0x1040] !== undefined) {
-            result.shadowTone = toneMap['' + fujiTags[0x1040]] || '' + fujiTags[0x1040];
-        }
+        if (fujiTags[0x1041] !== undefined) result.highlightTone = formatFujiTone(fujiTags[0x1041]);
+        if (fujiTags[0x1040] !== undefined) result.shadowTone = formatFujiTone(fujiTags[0x1040]);
 
         // Color / Saturation (0x1003) — skip if monochrome/acros
         if (fujiTags[0x1003] !== undefined) {
