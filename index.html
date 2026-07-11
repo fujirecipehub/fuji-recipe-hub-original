@@ -1128,10 +1128,33 @@ body.font-large { --font-size-base: 18px; }
 }
 .upload-preview-item {
     position: relative;
-    width: 80px;
-    height: 80px;
+    width: 96px;
+    height: 96px;
     border-radius: 6px;
     overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+.upload-preview-item.upload-preview-main {
+    border: 2px solid var(--accent-gold, #b8860b);
+}
+.upload-preview-label {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background: rgba(0,0,0,0.65);
+    color: #fff;
+    font-size: 10px;
+    text-align: center;
+    padding: 2px 0;
+    z-index: 1;
+    letter-spacing: 0.02em;
+}
+.form-hint {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-left: 0.4rem;
 }
 .upload-preview-item img {
     width: 100%;
@@ -1200,6 +1223,37 @@ body.font-large { --font-size-base: 18px; }
 }
 .form-btn-delete:hover {
     background: rgba(220,50,50,0.15);
+}
+.form-btn-share {
+    background: rgba(0, 100, 200, 0.08);
+    color: #0369a1;
+}
+.form-btn-share:hover {
+    background: rgba(0, 100, 200, 0.15);
+}
+.form-input-with-btn {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+}
+.form-input-with-btn .form-input {
+    flex: 1;
+}
+.form-inline-btn {
+    padding: 0 0.9rem;
+    border: 1px solid var(--border-color);
+    background: rgba(139,105,20,0.06);
+    color: var(--accent-gold, #7a5c10);
+    border-radius: 8px;
+    font-family: var(--font-outfit);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+.form-inline-btn:hover {
+    background: rgba(139,105,20,0.15);
 }
 
 /* My Recipe Card Badge */
@@ -1528,11 +1582,14 @@ body.font-large { --font-size-base: 18px; }
                     <div class="create-form-grid">
                         <div class="form-section">
                             <label class="form-label">レシピ名</label>
-                            <input type="text" id="myRecipeTitle" class="form-input" placeholder="例: My Kodak Portra 400">
+                            <div class="form-input-with-btn">
+                                <input type="text" id="myRecipeTitle" class="form-input" placeholder="例: My Kodak Portra 400">
+                                <button type="button" id="autoNameBtn" class="form-inline-btn" title="設定から自動生成">自動</button>
+                            </div>
                         </div>
 
                         <div class="form-section">
-                            <label class="form-label">作例写真</label>
+                            <label class="form-label">作例写真 <span class="form-hint">代表1枚 + サンプル2枚まで</span></label>
                             <div class="image-upload-area" id="imageUploadArea">
                                 <input type="file" id="myRecipeImage" accept="image/*" multiple hidden>
                                 <div class="upload-placeholder" id="uploadPlaceholder">
@@ -1659,6 +1716,7 @@ body.font-large { --font-size-base: 18px; }
                     <div class="create-form-actions">
                         <button id="deleteRecipeBtn" class="form-btn form-btn-delete" style="display:none;">削除</button>
                         <div class="form-btn-right">
+                            <button id="shareRecipeBtn" class="form-btn form-btn-share">共有</button>
                             <button id="cancelCreateBtn" class="form-btn form-btn-cancel">キャンセル</button>
                             <button id="saveRecipeBtn" class="form-btn form-btn-save">保存</button>
                         </div>
@@ -8936,6 +8994,8 @@ const createRecipeBtn = document.getElementById('createRecipeBtn');
 const saveRecipeBtn = document.getElementById('saveRecipeBtn');
 const cancelCreateBtn = document.getElementById('cancelCreateBtn');
 const deleteRecipeBtn = document.getElementById('deleteRecipeBtn');
+const shareRecipeBtn = document.getElementById('shareRecipeBtn');
+const autoNameBtn = document.getElementById('autoNameBtn');
 const imageUploadArea = document.getElementById('imageUploadArea');
 const myRecipeImageInput = document.getElementById('myRecipeImage');
 const uploadPlaceholder = document.getElementById('uploadPlaceholder');
@@ -9580,17 +9640,18 @@ function closeCreateModal() {
     uploadedImages = [];
 }
 
+const IMAGE_MAX = 3;
+const IMAGE_LABELS = ['メイン', 'サンプル 1', 'サンプル 2'];
+
 function renderUploadPreviews() {
     uploadPreviewList.innerHTML = '';
-    if (uploadedImages.length === 0) {
-        uploadPlaceholder.style.display = '';
-        return;
-    }
-    uploadPlaceholder.style.display = 'none';
+    uploadPlaceholder.style.display = uploadedImages.length >= IMAGE_MAX ? 'none'
+        : (uploadedImages.length === 0 ? '' : 'none');
     uploadedImages.forEach((src, i) => {
         const item = document.createElement('div');
-        item.className = 'upload-preview-item';
+        item.className = 'upload-preview-item' + (i === 0 ? ' upload-preview-main' : '');
         item.innerHTML = `
+            <span class="upload-preview-label">${IMAGE_LABELS[i] || ''}</span>
             <img src="${src}" alt="Preview">
             <button class="upload-preview-remove" data-idx="${i}">&times;</button>
         `;
@@ -9733,7 +9794,8 @@ function parseExifBlock(view, tiffStart, maxLen) {
         const tagCount = fg16(ifdOff);
 
         const fujiTags = {};
-        const fujiRawOffsets = {};
+        const fujiTypes = {};
+        const fujiCounts = {};
         for (let i = 0; i < tagCount; i++) {
             const te = ifdOff + 2 + i * 12;
             if (te + 12 > view.byteLength - mnBase) break;
@@ -9743,10 +9805,12 @@ function parseExifBlock(view, tiffStart, maxLen) {
             let fval;
             if (ftype === 3) fval = fg16(te + 8);
             else if (ftype === 4) fval = fg32(te + 8);
+            else if (ftype === 8) { const v = fg16(te + 8); fval = v > 32767 ? v - 65536 : v; }
             else if (ftype === 9) fval = fi32(te + 8);
             else fval = fg32(te + 8);
             fujiTags[ftag] = fval;
-            fujiRawOffsets[ftag] = te + 8;
+            fujiTypes[ftag] = ftype;
+            fujiCounts[ftag] = fcount;
         }
 
         // Film Simulation (0x1401)
@@ -9796,20 +9860,39 @@ function parseExifBlock(view, tiffStart, maxLen) {
             }
         }
 
-        // WB Fine Tune (0x100A) — value is offset to two Int32LE (Red, Blue)
-        // Per ExifTool: newer cameras store shift x20 (e.g. +3 -> 60)
+        // WB Fine Tune — 0x100A. Newer cameras: type=SLONG count=2, value is offset
+        // to (Red_i32, Blue_i32) pair, each stored ×20. Older cameras: 0x100A is Red
+        // shift and 0x100B is Blue shift directly, as int16 (may be ×20 or ×1).
         if (fujiTags[0x100A] !== undefined) {
+            let redRaw = null, blueRaw = null;
+            const t100a = fujiTypes[0x100A];
+            const c100a = fujiCounts[0x100A];
             try {
-                const wbftOffset = fujiTags[0x100A];
-                const redRaw = fi32(wbftOffset);
-                const blueRaw = fi32(wbftOffset + 4);
-                console.log('[EXIF] WBFineTune raw: R=' + redRaw + ' B=' + blueRaw);
+                if ((t100a === 9 || t100a === 4) && c100a === 2) {
+                    const off = fujiTags[0x100A];
+                    redRaw = fi32(off);
+                    blueRaw = fi32(off + 4);
+                } else {
+                    redRaw = fujiTags[0x100A];
+                    if (t100a === 3 && redRaw > 32767) redRaw -= 65536;
+                    if (fujiTags[0x100B] !== undefined) {
+                        blueRaw = fujiTags[0x100B];
+                        const t100b = fujiTypes[0x100B];
+                        if (t100b === 3 && blueRaw > 32767) blueRaw -= 65536;
+                    } else {
+                        blueRaw = 0;
+                    }
+                }
+            } catch (e) {}
+            console.log('[EXIF] WBFineTune raw R=' + redRaw + ' B=' + blueRaw + ' (t=' + t100a + ' c=' + c100a + ')');
+            if (redRaw !== null && blueRaw !== null) {
                 let red = null, blue = null;
                 for (const d of [20, 10, 1]) {
                     const r = redRaw / d, b = blueRaw / d;
-                    if (Number.isInteger(r) && Number.isInteger(b) &&
-                        r >= -9 && r <= 9 && b >= -9 && b <= 9) {
-                        red = r; blue = b;
+                    const rr = Math.round(r), rb = Math.round(b);
+                    if (Math.abs(r - rr) < 0.1 && Math.abs(b - rb) < 0.1 &&
+                        rr >= -9 && rr <= 9 && rb >= -9 && rb <= 9) {
+                        red = rr; blue = rb;
                         break;
                     }
                 }
@@ -9819,7 +9902,7 @@ function parseExifBlock(view, tiffStart, maxLen) {
                     if (blue !== 0) parts.push((blue > 0 ? '+' : '') + blue + ' Blue');
                     result.wbShift = parts.join(', ');
                 }
-            } catch (e) {}
+            }
         }
 
         // Highlight Tone (0x1041) / Shadow Tone (0x1040) — values in steps of 8
@@ -10037,7 +10120,7 @@ async function handleImageFiles(files) {
     let exifApplied = false;
     for (const file of files) {
         if (!file.type.startsWith('image/')) continue;
-        if (uploadedImages.length >= 5) break;
+        if (uploadedImages.length >= IMAGE_MAX) break;
         if (!photoUploadRecipeId && !exifApplied && uploadedImages.length === 0 && file.type === 'image/jpeg') {
             try {
                 const exif = await parseExifFromFile(file);
@@ -10109,6 +10192,72 @@ async function deleteMyRecipe() {
     await loadMyRecipes();
     closeCreateModal();
     renderRecipes();
+}
+
+function generateRecipeName() {
+    const film = document.getElementById('myFilmSim').value.trim();
+    const wb = document.getElementById('myWB').value.trim();
+    const parts = [];
+    if (film) parts.push(film);
+    if (wb) {
+        const wbBase = wb.split(',')[0].trim();
+        if (wbBase && wbBase !== film) parts.push(wbBase);
+    }
+    const d = new Date();
+    const dateStr = String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+    const base = parts.length ? parts.join(' × ') : 'My Recipe';
+    document.getElementById('myRecipeTitle').value = base + ' — ' + dateStr;
+}
+
+function buildRecipeShareText() {
+    const title = document.getElementById('myRecipeTitle').value.trim() || 'My Recipe';
+    const kv = [
+        ['Film Simulation', document.getElementById('myFilmSim').value],
+        ['Dynamic Range', document.getElementById('myDR').value],
+        ['Grain Effect', document.getElementById('myGrain').value],
+        ['Color Chrome Effect', document.getElementById('myCCE').value],
+        ['Color Chrome FX Blue', document.getElementById('myCCB').value],
+        ['White Balance', document.getElementById('myWB').value],
+        ['Highlight Tone', document.getElementById('myHighlight').value],
+        ['Shadow Tone', document.getElementById('myShadow').value],
+        ['Color', document.getElementById('myColor').value],
+        ['Sharpness', document.getElementById('mySharpness').value],
+        ['Noise Reduction', document.getElementById('myNR').value],
+        ['Clarity', document.getElementById('myClarity').value],
+        ['Exposure Comp.', document.getElementById('myExposure').value],
+    ];
+    const lines = ['📷 ' + title, '─────────'];
+    for (const [k, v] of kv) if (v && v.trim()) lines.push(k + ': ' + v);
+    const notes = document.getElementById('myNotes').value.trim();
+    if (notes) { lines.push('─────────'); lines.push(notes); }
+    lines.push('');
+    lines.push('#FUJIFILM #FilmSimulation');
+    return lines.join('\n');
+}
+
+async function shareMyRecipe() {
+    const text = buildRecipeShareText();
+    const title = document.getElementById('myRecipeTitle').value.trim() || 'My Recipe';
+    if (navigator.share) {
+        try {
+            await navigator.share({ title: title, text: text });
+            return;
+        } catch (e) {
+            if (e && e.name === 'AbortError') return;
+        }
+    }
+    try {
+        await navigator.clipboard.writeText(text);
+        alert('レシピをクリップボードにコピーしました');
+    } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); alert('レシピをクリップボードにコピーしました'); }
+        catch (err) { alert('コピーに失敗しました'); }
+        ta.remove();
+    }
 }
 
 // Toggle Favorite Status
@@ -10186,6 +10335,8 @@ function setupEventListeners() {
     cancelCreateBtn.addEventListener('click', closeCreateModal);
     saveRecipeBtn.addEventListener('click', saveMyRecipe);
     deleteRecipeBtn.addEventListener('click', deleteMyRecipe);
+    shareRecipeBtn.addEventListener('click', shareMyRecipe);
+    autoNameBtn.addEventListener('click', generateRecipeName);
     createModal.addEventListener('click', (e) => {
         if (e.target === createModal) closeCreateModal();
     });
