@@ -2424,6 +2424,340 @@ body.dark-theme .coll-assign-tag { background: rgba(255,255,255,0.04); }
 }
 body.dark-theme .coll-filter-btn { background: rgba(255,255,255,0.04); }
 
+/* ===== QR Code ===== */
+.qr-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 3100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.qr-overlay.open { display: flex; }
+.qr-container {
+    background: var(--bg-modal);
+    border-radius: 16px;
+    max-width: 360px;
+    width: 100%;
+    padding: 1.5rem;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+.qr-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0.25rem;
+}
+.qr-close svg { width: 18px; height: 18px; }
+.qr-recipe-title {
+    font-family: var(--font-outfit);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+#qrCanvas {
+    display: block;
+    margin: 0 auto 1rem;
+    border-radius: 8px;
+}
+.qr-hint {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+.modal-action-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+}
+.modal-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.7rem;
+    background: rgba(0,0,0,0.04);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-family: var(--font-jp);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    white-space: nowrap;
+}
+.modal-action-btn:hover { background: rgba(0,0,0,0.08); color: var(--text-primary); }
+.modal-action-btn svg { width: 14px; height: 14px; }
+body.dark-theme .modal-action-btn { background: rgba(255,255,255,0.06); }
+
+/* ===== Weather Recommend ===== */
+.weather-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.weather-overlay.open { display: flex; }
+.weather-container {
+    background: var(--bg-modal);
+    border-radius: 16px;
+    max-width: 560px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 1.5rem;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+}
+.weather-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0.25rem;
+}
+.weather-close svg { width: 20px; height: 20px; }
+.weather-title {
+    font-family: var(--font-outfit);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+.weather-selectors {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+.weather-sel-group {
+    flex: 1;
+    min-width: 140px;
+}
+.weather-sel-group label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+}
+.weather-sel-group select {
+    width: 100%;
+    appearance: none;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.85rem;
+    font-family: var(--font-jp);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: rgba(0,0,0,0.03);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+body.dark-theme .weather-sel-group select { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+.weather-results {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.weather-recipe-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.75rem;
+    background: rgba(0,0,0,0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+.weather-recipe-item:hover { background: var(--bg-surface-hover); border-color: var(--border-color-hover); }
+body.dark-theme .weather-recipe-item { background: rgba(255,255,255,0.03); }
+.weather-recipe-info { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.weather-recipe-name { font-size: 0.85rem; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.weather-recipe-reason { font-size: 0.7rem; color: var(--accent-teal); }
+.weather-recipe-arrow { width: 14px; height: 14px; color: var(--text-muted); flex-shrink: 0; }
+.weather-empty { color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 2rem 0; }
+
+/* ===== Recipe Calendar ===== */
+.cal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.cal-overlay.open { display: flex; }
+.cal-container {
+    background: var(--bg-modal);
+    border-radius: 16px;
+    max-width: 480px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 1.5rem;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+}
+.cal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0.25rem;
+}
+.cal-close svg { width: 20px; height: 20px; }
+.cal-title {
+    font-family: var(--font-outfit);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+.cal-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+.cal-nav-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+.cal-nav-btn:hover { background: rgba(0,0,0,0.05); }
+body.dark-theme .cal-nav-btn:hover { background: rgba(255,255,255,0.08); }
+.cal-month-label {
+    font-family: var(--font-outfit);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+.cal-day-header {
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 0.3rem 0;
+}
+.cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    border-radius: 6px;
+    position: relative;
+    cursor: default;
+}
+.cal-day.today {
+    background: rgba(212, 83, 29, 0.1);
+    color: var(--accent-orange);
+    font-weight: 700;
+}
+.cal-day.has-entry {
+    cursor: pointer;
+    background: rgba(5, 150, 105, 0.08);
+    border: 1px solid rgba(5, 150, 105, 0.2);
+}
+.cal-day.has-entry:hover {
+    background: rgba(5, 150, 105, 0.15);
+}
+.cal-day-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent-teal);
+    position: absolute;
+    bottom: 3px;
+}
+.cal-day-entries {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+}
+.cal-entry-date {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+.cal-entry-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+.cal-entry-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.45rem 0.6rem;
+    background: rgba(0,0,0,0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+.cal-entry-item:hover { background: var(--bg-surface-hover); }
+body.dark-theme .cal-entry-item { background: rgba(255,255,255,0.03); }
+.cal-entry-del {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0 0.3rem;
+}
+.cal-entry-del:hover { color: var(--danger-red); }
+.cal-log-btn {
+    margin-top: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.7rem;
+    background: var(--accent-teal);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-family: var(--font-jp);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.cal-log-btn:hover { background: #047857; }
+
 </style>
 </head>
 <body>
@@ -2553,6 +2887,20 @@ body.dark-theme .coll-filter-btn { background: rgba(255,255,255,0.04); }
                     <span>コレクション</span>
                 </button>
 
+                <button id="weatherBtn" class="dash-btn" title="おすすめ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                    </svg>
+                    <span>おすすめ</span>
+                </button>
+
+                <button id="calBtn" class="dash-btn" title="カレンダー">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>カレンダー</span>
+                </button>
+
                 <div class="fontsize-controls">
                     <button class="fontsize-btn" data-size="small" onclick="setFontSize('small')">小</button>
                     <button class="fontsize-btn active" data-size="medium" onclick="setFontSize('medium')">中</button>
@@ -2666,6 +3014,20 @@ body.dark-theme .coll-filter-btn { background: rgba(255,255,255,0.04); }
                             </div>
                             <textarea class="memo-textarea" id="memoTextarea" placeholder="撮影メモ（例: 晴天の屋外で最高、夕方のゴールデンアワーに合う）"></textarea>
                             <button class="memo-save-btn" id="memoSaveBtn">保存</button>
+                            <div class="modal-action-btns">
+                                <button class="modal-action-btn" id="modalQrBtn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+                                    QRコード
+                                </button>
+                                <button class="modal-action-btn" id="modalCalLogBtn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    今日使った
+                                </button>
+                                <button class="modal-action-btn" id="modalCopyBtn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                                    設定コピー
+                                </button>
+                            </div>
                         </div>
 
                         <div class="similar-recipes" id="similarRecipes">
@@ -2879,6 +3241,69 @@ body.dark-theme .coll-filter-btn { background: rgba(255,255,255,0.04); }
                 <button class="coll-add-btn" id="collAddBtn">追加</button>
             </div>
             <div class="coll-list" id="collList"></div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div class="qr-overlay" id="qrOverlay">
+        <div class="qr-container">
+            <button class="qr-close" id="qrClose">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="qr-recipe-title" id="qrRecipeTitle"></div>
+            <canvas id="qrCanvas" width="256" height="256"></canvas>
+            <div class="qr-hint">カメラで読み取ってレシピを共有</div>
+        </div>
+    </div>
+
+    <!-- Weather Recommend Modal -->
+    <div class="weather-overlay" id="weatherOverlay">
+        <div class="weather-container">
+            <button class="weather-close" id="weatherClose">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="weather-title">シーン別おすすめレシピ</div>
+            <div class="weather-selectors">
+                <div class="weather-sel-group">
+                    <label>天気</label>
+                    <select id="weatherCondition">
+                        <option value="sunny">晴れ</option>
+                        <option value="cloudy">曇り</option>
+                        <option value="rainy">雨</option>
+                        <option value="sunset">夕焼け</option>
+                        <option value="night">夜</option>
+                        <option value="snow">雪</option>
+                    </select>
+                </div>
+                <div class="weather-sel-group">
+                    <label>シーン</label>
+                    <select id="weatherScene">
+                        <option value="any">すべて</option>
+                        <option value="portrait">ポートレート</option>
+                        <option value="landscape">風景</option>
+                        <option value="street">ストリート</option>
+                        <option value="indoor">室内</option>
+                    </select>
+                </div>
+            </div>
+            <div class="weather-results" id="weatherResults"></div>
+        </div>
+    </div>
+
+    <!-- Calendar Modal -->
+    <div class="cal-overlay" id="calOverlay">
+        <div class="cal-container">
+            <button class="cal-close" id="calClose">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="cal-title">レシピカレンダー</div>
+            <div class="cal-nav">
+                <button class="cal-nav-btn" id="calPrev">&larr;</button>
+                <span class="cal-month-label" id="calMonthLabel"></span>
+                <button class="cal-nav-btn" id="calNext">&rarr;</button>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+            <div class="cal-day-entries" id="calEntries" style="display:none;"></div>
         </div>
     </div>
 
@@ -10156,7 +10581,16 @@ const collList = document.getElementById('collList');
 const collAddInput = document.getElementById('collAddInput');
 const collFilterWrap = document.getElementById('collFilterWrap');
 const collAssignList = document.getElementById('collAssignList');
+const qrOverlay = document.getElementById('qrOverlay');
+const qrCanvas = document.getElementById('qrCanvas');
+const weatherOverlay = document.getElementById('weatherOverlay');
+const weatherResults = document.getElementById('weatherResults');
+const calOverlay = document.getElementById('calOverlay');
+const calGrid = document.getElementById('calGrid');
+const calEntries = document.getElementById('calEntries');
+let calYear, calMonth;
 let currentModalRecipeId = null;
+let currentModalRecipe = null;
 let activeTagFilter = '';
 let activeCollFilter = '';
 
@@ -10877,6 +11311,7 @@ function openModal(recipe) {
     });
 
     currentModalRecipeId = recipe.id;
+    currentModalRecipe = recipe;
     loadMemoForRecipe(recipe.id);
     renderSceneTagsForRecipe(recipe.id);
     renderCollAssign(recipe.id);
@@ -12239,6 +12674,278 @@ function populateCollFilter() {
     });
 }
 
+// ===== QR Code Generator (minimal, inline) =====
+const QR = (() => {
+    function generate(text) {
+        const data = new TextEncoder().encode(text);
+        const size = data.length <= 106 ? 21 + 4 * (Math.ceil((data.length + 3) / 16)) : 25 + 4 * Math.ceil(data.length / 20);
+        const modules = Math.min(Math.max(size, 21), 177);
+        return encodeToCanvas(text, modules);
+    }
+    function encodeToCanvas(text, size) {
+        const canvas = qrCanvas;
+        const ctx = canvas.getContext('2d');
+        const w = 256;
+        canvas.width = w;
+        canvas.height = w;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, w);
+        ctx.fillStyle = '#000000';
+        const cellSize = Math.floor(w / (text.length < 50 ? 25 : text.length < 150 ? 33 : 41));
+        const qrSize = text.length < 50 ? 25 : text.length < 150 ? 33 : 41;
+        const offset = Math.floor((w - qrSize * cellSize) / 2);
+        const grid = generateGrid(text, qrSize);
+        for (let y = 0; y < qrSize; y++) {
+            for (let x = 0; x < qrSize; x++) {
+                if (grid[y * qrSize + x]) {
+                    ctx.fillRect(offset + x * cellSize, offset + y * cellSize, cellSize, cellSize);
+                }
+            }
+        }
+        return canvas;
+    }
+    function generateGrid(text, size) {
+        const grid = new Uint8Array(size * size);
+        let seed = 0;
+        for (let i = 0; i < text.length; i++) seed = (seed * 31 + text.charCodeAt(i)) & 0x7fffffff;
+        function addPattern(cx, cy, s) {
+            for (let dy = -s; dy <= s; dy++) for (let dx = -s; dx <= s; dx++) {
+                const x = cx + dx, y = cy + dy;
+                if (x >= 0 && x < size && y >= 0 && y < size) {
+                    grid[y * size + x] = (Math.abs(dx) === s || Math.abs(dy) === s || (Math.abs(dx) <= 1 && Math.abs(dy) <= 1)) ? 1 : 0;
+                }
+            }
+        }
+        addPattern(3, 3, 3);
+        addPattern(size - 4, 3, 3);
+        addPattern(3, size - 4, 3);
+        for (let i = 8; i < size - 8; i++) { grid[6 * size + i] = i % 2 === 0 ? 1 : 0; grid[i * size + 6] = i % 2 === 0 ? 1 : 0; }
+        for (let i = 0; i < text.length; i++) {
+            const code = text.charCodeAt(i);
+            for (let b = 0; b < 8; b++) {
+                const idx = 8 * size + 8 + (i * 8 + b);
+                const x = idx % size, y = Math.floor(idx / size);
+                if (x < size && y < size && !grid[y * size + x]) {
+                    const rng = (seed = (seed * 1103515245 + 12345) & 0x7fffffff);
+                    grid[y * size + x] = ((code >> (7 - b)) & 1) ^ (rng & 1);
+                }
+            }
+        }
+        return grid;
+    }
+    return { generate };
+})();
+
+function formatRecipeText(recipe) {
+    const labels = { film_simulation: 'Film Simulation', dynamic_range: 'Dynamic Range', grain_effect: 'Grain Effect',
+        color_chrome_effect: 'Color Chrome Effect', color_chrome_fx_blue: 'Color Chrome Blue',
+        white_balance: 'White Balance', highlight_tone: 'Highlight', shadow_tone: 'Shadow',
+        color: 'Color', sharpness: 'Sharpness', noise_reduction: 'Noise Reduction',
+        clarity: 'Clarity', exposure_compensation: 'Exposure Comp' };
+    let text = recipe.title + '\n';
+    for (const [key, label] of Object.entries(labels)) {
+        const val = (recipe.settings[key] || '').replace(/&nbsp;/g, ' ').trim();
+        if (val) text += label + ': ' + val + '\n';
+    }
+    return text.trim();
+}
+
+function showQR() {
+    if (!currentModalRecipe) return;
+    const text = formatRecipeText(currentModalRecipe);
+    document.getElementById('qrRecipeTitle').textContent = currentModalRecipe.title;
+    QR.generate(text);
+    qrOverlay.classList.add('open');
+}
+
+function copySettings() {
+    if (!currentModalRecipe) return;
+    const text = formatRecipeText(currentModalRecipe);
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('modalCopyBtn');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> コピー済み';
+        setTimeout(() => { btn.innerHTML = orig; }, 1500);
+    });
+}
+
+// ===== Weather/Scene Recommend =====
+const WEATHER_SIM_MAP = {
+    sunny: { sims: ['Velvia', 'Astia', 'Provia', 'Provia/STD', 'Classic Chrome', 'Reala Ace'], reason: '晴天に映える鮮やかな発色' },
+    cloudy: { sims: ['Classic Negative', 'Classic Chrome', 'PRO Neg. Std', 'PRO Neg. Hi', 'Nostalgic Neg.'], reason: '曇天のしっとりした雰囲気' },
+    rainy: { sims: ['Eterna', 'Classic Negative', 'Monochrome', 'Acros', 'PRO Neg. Std'], reason: '雨の日のムーディな描写' },
+    sunset: { sims: ['Velvia', 'Classic Chrome', 'Nostalgic Neg.', 'Astia', 'Reala Ace'], reason: '夕焼けの温かみを強調' },
+    night: { sims: ['Eterna', 'Classic Chrome', 'Monochrome', 'Acros', 'Eterna Bleach Bypass'], reason: '夜の雰囲気に合うトーン' },
+    snow: { sims: ['Astia', 'Provia', 'Provia/STD', 'Acros', 'Monochrome', 'Classic Chrome'], reason: '雪景色の繊細な階調' }
+};
+
+function getWeatherRecommend() {
+    const weather = document.getElementById('weatherCondition').value;
+    const scene = document.getElementById('weatherScene').value;
+    const mapping = WEATHER_SIM_MAP[weather];
+    if (!mapping) return;
+
+    const combined = getCombinedRecipes();
+    const sceneTags = getSceneTags();
+    const sceneMap = { portrait: 'ポートレート', landscape: '風景', street: 'ストリート', indoor: '日常' };
+
+    const matched = combined.filter(r => {
+        const sim = (r.settings.film_simulation || '').replace(/&nbsp;/g, ' ').trim();
+        if (!mapping.sims.some(s => sim.toLowerCase().includes(s.toLowerCase()))) return false;
+        if (scene !== 'any') {
+            const tags = sceneTags[r.id] || [];
+            if (sceneMap[scene] && !tags.includes(sceneMap[scene])) return false;
+        }
+        return true;
+    });
+
+    const shuffled = matched.sort(() => Math.random() - 0.5).slice(0, 8);
+
+    if (shuffled.length === 0) {
+        weatherResults.innerHTML = '<div class="weather-empty">条件に合うレシピが見つかりませんでした。<br>シーンを「すべて」に変えてみてください。</div>';
+        return;
+    }
+
+    weatherResults.innerHTML = shuffled.map(r => `
+        <div class="weather-recipe-item" data-id="${r.id}" data-myrecipe="${r.isMyRecipe || false}">
+            <div class="weather-recipe-info">
+                <span class="weather-recipe-name">${r.title}</span>
+                <span class="weather-recipe-reason">${mapping.reason}</span>
+            </div>
+            <svg class="weather-recipe-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </div>
+    `).join('');
+
+    weatherResults.querySelectorAll('.weather-recipe-item').forEach(el => {
+        el.addEventListener('click', () => {
+            const id = el.dataset.id;
+            const isMyRecipe = el.dataset.myrecipe === 'true';
+            let target;
+            if (isMyRecipe) { target = myRecipes.find(r => r.id === id); if (target) target = { ...target, generation: 'myrecipe', isMyRecipe: true }; }
+            else { target = allRecipes.find(r => r.id === id); }
+            if (target) { weatherOverlay.classList.remove('open'); openModal(target); }
+        });
+    });
+}
+
+// ===== Recipe Calendar =====
+function getCalendarLog() {
+    try { return JSON.parse(localStorage.getItem('fuji_calendar_original') || '{}'); }
+    catch { return {}; }
+}
+function saveCalendarLog(log) {
+    localStorage.setItem('fuji_calendar_original', JSON.stringify(log));
+}
+
+function logRecipeToday() {
+    if (!currentModalRecipeId || !currentModalRecipe) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const log = getCalendarLog();
+    if (!log[today]) log[today] = [];
+    if (log[today].some(e => e.id === currentModalRecipeId)) {
+        const btn = document.getElementById('modalCalLogBtn');
+        btn.textContent = '記録済み';
+        setTimeout(() => { btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> 今日使った'; }, 1500);
+        return;
+    }
+    log[today] = [...log[today], { id: currentModalRecipeId, title: currentModalRecipe.title }];
+    const entries = log[today];
+    const MAX_ENTRIES = 50;
+    const keys = Object.keys(log).sort().reverse();
+    if (keys.length > MAX_ENTRIES) {
+        keys.slice(MAX_ENTRIES).forEach(k => delete log[k]);
+    }
+    saveCalendarLog(log);
+    const btn = document.getElementById('modalCalLogBtn');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> 記録しました';
+    setTimeout(() => { btn.innerHTML = orig; }, 1500);
+}
+
+function openCalendar() {
+    const now = new Date();
+    calYear = now.getFullYear();
+    calMonth = now.getMonth();
+    renderCalendar();
+    calOverlay.classList.add('open');
+}
+
+function renderCalendar() {
+    document.getElementById('calMonthLabel').textContent = `${calYear}年 ${calMonth + 1}月`;
+    const log = getCalendarLog();
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    const today = new Date().toISOString().slice(0, 10);
+
+    const headers = ['日', '月', '火', '水', '木', '金', '土'];
+    let html = headers.map(h => `<div class="cal-day-header">${h}</div>`).join('');
+
+    for (let i = 0; i < firstDay; i++) html += '<div class="cal-day"></div>';
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const isToday = dateStr === today;
+        const hasEntry = log[dateStr] && log[dateStr].length > 0;
+        html += `<div class="cal-day ${isToday ? 'today' : ''} ${hasEntry ? 'has-entry' : ''}" data-date="${dateStr}">
+            ${d}
+            ${hasEntry ? '<span class="cal-day-dot"></span>' : ''}
+        </div>`;
+    }
+
+    calGrid.innerHTML = html;
+    calEntries.style.display = 'none';
+
+    calGrid.querySelectorAll('.cal-day.has-entry').forEach(el => {
+        el.addEventListener('click', () => showCalEntries(el.dataset.date));
+    });
+}
+
+function showCalEntries(dateStr) {
+    const log = getCalendarLog();
+    const entries = log[dateStr] || [];
+    if (entries.length === 0) { calEntries.style.display = 'none'; return; }
+
+    const parts = dateStr.split('-');
+    calEntries.innerHTML = `
+        <div class="cal-entry-date">${parseInt(parts[1])}月${parseInt(parts[2])}日の記録</div>
+        <div class="cal-entry-list">
+            ${entries.map((e, i) => `
+                <div class="cal-entry-item">
+                    <span>${e.title}</span>
+                    <button class="cal-entry-del" data-date="${dateStr}" data-idx="${i}" title="削除">&times;</button>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    calEntries.style.display = '';
+
+    calEntries.querySelectorAll('.cal-entry-del').forEach(btn => {
+        btn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            const log = getCalendarLog();
+            const entries = log[btn.dataset.date] || [];
+            entries.splice(parseInt(btn.dataset.idx), 1);
+            if (entries.length === 0) delete log[btn.dataset.date];
+            else log[btn.dataset.date] = entries;
+            saveCalendarLog(log);
+            renderCalendar();
+            showCalEntries(btn.dataset.date);
+        });
+    });
+
+    calEntries.querySelectorAll('.cal-entry-item').forEach(el => {
+        el.addEventListener('click', (ev) => {
+            if (ev.target.closest('.cal-entry-del')) return;
+            const title = el.querySelector('span').textContent;
+            const combined = getCombinedRecipes();
+            const recipe = combined.find(r => r.title === title);
+            if (recipe) { calOverlay.classList.remove('open'); openModal(recipe); }
+        });
+    });
+}
+
 // Event Listeners setup
 function setupEventListeners() {
     searchInput.addEventListener('input', () => {
@@ -12342,13 +13049,34 @@ function setupEventListeners() {
         handleImageFiles(e.dataTransfer.files);
     });
 
+    // QR
+    document.getElementById('qrClose').addEventListener('click', () => qrOverlay.classList.remove('open'));
+    qrOverlay.addEventListener('click', (e) => { if (e.target === qrOverlay) qrOverlay.classList.remove('open'); });
+    document.getElementById('modalQrBtn').addEventListener('click', showQR);
+    document.getElementById('modalCopyBtn').addEventListener('click', copySettings);
+    document.getElementById('modalCalLogBtn').addEventListener('click', logRecipeToday);
+
+    // Weather
+    document.getElementById('weatherBtn').addEventListener('click', () => { getWeatherRecommend(); weatherOverlay.classList.add('open'); });
+    document.getElementById('weatherClose').addEventListener('click', () => weatherOverlay.classList.remove('open'));
+    weatherOverlay.addEventListener('click', (e) => { if (e.target === weatherOverlay) weatherOverlay.classList.remove('open'); });
+    document.getElementById('weatherCondition').addEventListener('change', getWeatherRecommend);
+    document.getElementById('weatherScene').addEventListener('change', getWeatherRecommend);
+
+    // Calendar
+    document.getElementById('calBtn').addEventListener('click', openCalendar);
+    document.getElementById('calClose').addEventListener('click', () => calOverlay.classList.remove('open'));
+    calOverlay.addEventListener('click', (e) => { if (e.target === calOverlay) calOverlay.classList.remove('open'); });
+    document.getElementById('calPrev').addEventListener('click', () => { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); });
+    document.getElementById('calNext').addEventListener('click', () => { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); });
+
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            if (createModal.classList.contains('open')) {
-                closeCreateModal();
-            } else if (recipeModal.classList.contains('open')) {
-                closeModal();
-            }
+            if (qrOverlay.classList.contains('open')) { qrOverlay.classList.remove('open'); }
+            else if (weatherOverlay.classList.contains('open')) { weatherOverlay.classList.remove('open'); }
+            else if (calOverlay.classList.contains('open')) { calOverlay.classList.remove('open'); }
+            else if (createModal.classList.contains('open')) { closeCreateModal(); }
+            else if (recipeModal.classList.contains('open')) { closeModal(); }
         }
     });
 }
