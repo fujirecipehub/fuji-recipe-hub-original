@@ -2439,13 +2439,41 @@ body.dark-theme .coll-filter-btn { background: rgba(255,255,255,0.04); }
 .qr-container {
     background: var(--bg-modal);
     border-radius: 16px;
-    max-width: 360px;
+    max-width: 400px;
     width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
     padding: 1.5rem;
     position: relative;
     box-shadow: var(--shadow-lg);
     text-align: center;
 }
+.qr-share-img {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto 1rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow-md);
+}
+.qr-download-btn {
+    margin-top: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.1rem;
+    background: var(--accent-teal);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-family: var(--font-jp);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.qr-download-btn svg { width: 16px; height: 16px; }
+.qr-download-btn:hover { background: #047857; }
 .qr-close {
     position: absolute;
     top: 0.75rem;
@@ -3151,6 +3179,10 @@ body.dark-theme .cal-entry-item { background: rgba(255,255,255,0.03); }
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
                                     QRコード
                                 </button>
+                                <button class="modal-action-btn" id="modalDownloadBtn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                    画像を保存
+                                </button>
                                 <button class="modal-action-btn" id="modalCalLogBtn">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                     今日使った
@@ -3383,8 +3415,13 @@ body.dark-theme .cal-entry-item { background: rgba(255,255,255,0.03); }
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
             <div class="qr-recipe-title" id="qrRecipeTitle"></div>
+            <img id="qrShareImg" class="qr-share-img" alt="レシピカード" />
             <canvas id="qrCanvas" width="256" height="256"></canvas>
             <div class="qr-hint">カメラで読み取ってレシピを共有</div>
+            <button class="qr-download-btn" id="qrDownloadBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                画像を保存
+            </button>
         </div>
     </div>
 
@@ -11062,7 +11099,7 @@ function getCombinedRecipes() {
         generation: 'myrecipe',
         isMyRecipe: true
     }));
-    return [...allRecipes, ...myMapped];
+    return [...myMapped, ...allRecipes];
 }
 
 function extractWBBase(wb) {
@@ -12136,6 +12173,7 @@ function generateRecipeName() {
     document.getElementById('myRecipeTitle').value = base + ' — ' + dateStr;
 }
 
+// Build share card from the create/edit form
 async function renderRecipeShareCard() {
     const title = document.getElementById('myRecipeTitle').value.trim() || 'My Recipe';
     const camera = createModal.dataset.camera || '';
@@ -12156,15 +12194,56 @@ async function renderRecipeShareCard() {
         ['Clarity', document.getElementById('myClarity').value],
         ['Exposure Comp.', document.getElementById('myExposure').value],
     ].filter(([k,v]) => v && v.toString().trim());
+    return drawShareCard({ title, camera, shotDate, notes, kv, mainImgSrc: uploadedImages[0] });
+}
 
-    const mainImg = uploadedImages[0];
+// Build share card from a recipe object (used by the detail modal QR / download)
+async function renderShareCardForRecipe(recipe) {
+    const title = recipe.title || 'Recipe';
+    const camera = recipe.camera || '';
+    const shotDate = (recipe.shotDate || '').replace(/^(\d{4}):(\d{2}):(\d{2}).*/, '$1/$2/$3');
+    const memo = (getMemos()[recipe.id] || {}).memo || '';
+    const s = recipe.settings || {};
+    const clean = v => (v || '').toString().replace(/&nbsp;/g, ' ').trim();
+    const kv = [
+        ['Film Simulation', s.film_simulation],
+        ['Dynamic Range', s.dynamic_range],
+        ['Grain Effect', s.grain_effect],
+        ['Color Chrome', s.color_chrome_effect],
+        ['Color Chrome FX Blue', s.color_chrome_fx_blue],
+        ['White Balance', s.white_balance],
+        ['Highlight Tone', s.highlight_tone],
+        ['Shadow Tone', s.shadow_tone],
+        ['Color', s.color],
+        ['Sharpness', s.sharpness],
+        ['Noise Reduction', s.noise_reduction],
+        ['Clarity', s.clarity],
+        ['Exposure Comp.', s.exposure_compensation],
+    ].map(([k, v]) => [k, clean(v)]).filter(([k, v]) => v);
+
+    let mainImgSrc = null;
+    if (recipe.isMyRecipe && recipe.images && recipe.images.length > 0) mainImgSrc = recipe.images[0];
+    else if (recipePhotos[recipe.id] && recipePhotos[recipe.id].length > 0) mainImgSrc = recipePhotos[recipe.id][0];
+    else if (recipe.imageUrl) mainImgSrc = recipe.imageUrl;
+
+    return drawShareCard({ title, camera, shotDate, notes: memo, kv, mainImgSrc });
+}
+
+// Core canvas drawing shared by both share-card builders
+async function drawShareCard({ title, camera, shotDate, notes, kv, mainImgSrc }) {
+    title = title || 'Recipe';
+    camera = camera || '';
+    shotDate = shotDate || '';
+    notes = notes || '';
+    kv = kv || [];
+
     let img = null;
-    if (mainImg) {
+    if (mainImgSrc) {
         img = await new Promise((res, rej) => {
             const im = new Image();
             im.onload = () => res(im);
             im.onerror = rej;
-            im.src = mainImg;
+            im.src = mainImgSrc;
         }).catch(() => null);
     }
 
@@ -12585,13 +12664,31 @@ function updateDarkModeUI(isDark) {
 
 // ===== Statistics Dashboard =====
 function openDashboard() {
-    const combined = getCombinedRecipes();
-    const memos = getMemos();
-    const sceneTags = getSceneTags();
+    const myList = myRecipes.map(r => ({ ...r, isMyRecipe: true }));
+    const myIds = new Set(myList.map(r => r.id));
+    const memosAll = getMemos();
+    const sceneTagsAll = getSceneTags();
     const collections = getCollections();
 
+    // Scope everything to My Recipes only
+    const memos = {};
+    Object.keys(memosAll).forEach(id => { if (myIds.has(id)) memos[id] = memosAll[id]; });
+    const sceneTags = {};
+    Object.keys(sceneTagsAll).forEach(id => { if (myIds.has(id)) sceneTags[id] = sceneTagsAll[id]; });
+    const favCount = myList.filter(r => favorites.has(r.id)).length;
+    const collCount = collections.filter(c => c.recipes.some(id => myIds.has(id))).length;
+
+    if (myList.length === 0) {
+        dashContent.innerHTML = `<div class="dash-section" style="text-align:center;padding:2rem 1rem;color:var(--text-muted);">
+            <p style="font-size:0.95rem;">マイレシピがまだありません。</p>
+            <p style="font-size:0.82rem;margin-top:0.5rem;">「マイレシピ作成」から追加すると統計が表示されます。</p>
+        </div>`;
+        dashOverlay.classList.add('open');
+        return;
+    }
+
     const simCounts = {};
-    combined.forEach(r => {
+    myList.forEach(r => {
         const sim = (r.settings.film_simulation || 'Unknown').replace(/&nbsp;/g, ' ').trim();
         simCounts[sim] = (simCounts[sim] || 0) + 1;
     });
@@ -12614,13 +12711,14 @@ function openDashboard() {
 
     let html = `
         <div class="dash-section">
+            <div class="dash-section-title">マイレシピ統計</div>
             <div class="dash-summary">
-                <div class="dash-stat-card"><div class="dash-stat-value">${combined.length}</div><div class="dash-stat-label">総レシピ数</div></div>
-                <div class="dash-stat-card"><div class="dash-stat-value">${favorites.size}</div><div class="dash-stat-label">お気に入り</div></div>
+                <div class="dash-stat-card"><div class="dash-stat-value">${myList.length}</div><div class="dash-stat-label">マイレシピ数</div></div>
+                <div class="dash-stat-card"><div class="dash-stat-value">${favCount}</div><div class="dash-stat-label">お気に入り</div></div>
                 <div class="dash-stat-card"><div class="dash-stat-value">${ratedCount}</div><div class="dash-stat-label">評価済み</div></div>
                 <div class="dash-stat-card"><div class="dash-stat-value">${avgRating}</div><div class="dash-stat-label">平均★</div></div>
                 <div class="dash-stat-card"><div class="dash-stat-value">${Object.keys(sceneTags).length}</div><div class="dash-stat-label">タグ付き</div></div>
-                <div class="dash-stat-card"><div class="dash-stat-value">${collections.length}</div><div class="dash-stat-label">コレクション</div></div>
+                <div class="dash-stat-card"><div class="dash-stat-value">${collCount}</div><div class="dash-stat-label">コレクション</div></div>
             </div>
         </div>
         <div class="dash-section">
@@ -13179,12 +13277,64 @@ function formatRecipeText(recipe) {
     return text.trim();
 }
 
-function showQR() {
+let currentShareBlob = null;
+
+function shareCardFilename(recipe) {
+    return (recipe.title || 'recipe').replace(/[\\/:*?"<>|]/g, '_').slice(0, 60) + '.png';
+}
+
+async function showQR() {
     if (!currentModalRecipe) return;
-    const text = formatRecipeText(currentModalRecipe);
-    document.getElementById('qrRecipeTitle').textContent = currentModalRecipe.title;
+    const recipe = currentModalRecipe;
+    const text = formatRecipeText(recipe);
+    document.getElementById('qrRecipeTitle').textContent = recipe.title;
     QR.generate(text);
     qrOverlay.classList.add('open');
+
+    // Render the same visual share card shown when sharing
+    const imgEl = document.getElementById('qrShareImg');
+    const dlBtn = document.getElementById('qrDownloadBtn');
+    imgEl.style.display = 'none';
+    dlBtn.style.display = 'none';
+    currentShareBlob = null;
+    try {
+        const blob = await renderShareCardForRecipe(recipe);
+        if (blob) {
+            currentShareBlob = blob;
+            imgEl.src = URL.createObjectURL(blob);
+            imgEl.style.display = 'block';
+            dlBtn.style.display = 'inline-flex';
+        }
+    } catch (e) { console.warn('share card render failed', e); }
+}
+
+function triggerDownload(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function downloadShareCard() {
+    if (!currentModalRecipe) return;
+    const recipe = currentModalRecipe;
+    const btn = document.getElementById('modalDownloadBtn');
+    const orig = btn ? btn.innerHTML : '';
+    if (btn) btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:14px;height:14px"><circle cx="12" cy="12" r="9" stroke-width="2" opacity="0.3"/><path stroke-linecap="round" stroke-width="2" d="M12 3a9 9 0 019 9"/></svg> 生成中…';
+    try {
+        const blob = await renderShareCardForRecipe(recipe);
+        if (!blob) { alert('共有画像の生成に失敗しました'); return; }
+        triggerDownload(blob, shareCardFilename(recipe));
+    } catch (e) {
+        console.warn('download share card failed', e);
+        alert('共有画像の生成に失敗しました');
+    } finally {
+        if (btn) btn.innerHTML = orig;
+    }
 }
 
 function copySettings() {
@@ -13585,6 +13735,8 @@ function setupEventListeners() {
     document.getElementById('qrClose').addEventListener('click', () => qrOverlay.classList.remove('open'));
     qrOverlay.addEventListener('click', (e) => { if (e.target === qrOverlay) qrOverlay.classList.remove('open'); });
     document.getElementById('modalQrBtn').addEventListener('click', showQR);
+    document.getElementById('modalDownloadBtn').addEventListener('click', downloadShareCard);
+    document.getElementById('qrDownloadBtn').addEventListener('click', downloadShareCard);
     document.getElementById('modalCopyBtn').addEventListener('click', copySettings);
     document.getElementById('modalCalLogBtn').addEventListener('click', logRecipeToday);
 
