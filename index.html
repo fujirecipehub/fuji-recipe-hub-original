@@ -2758,6 +2758,132 @@ body.dark-theme .cal-entry-item { background: rgba(255,255,255,0.03); }
 }
 .cal-log-btn:hover { background: #047857; }
 
+/* Print Recipe Cards */
+.print-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 3000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+.print-overlay.open { display: flex; }
+.print-container {
+    background: var(--bg-modal);
+    border-radius: 16px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 1.5rem;
+    position: relative;
+}
+.print-close {
+    position: absolute; top: 0.8rem; right: 0.8rem;
+    background: none; border: none; cursor: pointer;
+    color: var(--text-primary); width: 28px; height: 28px;
+}
+.print-close svg { width: 100%; height: 100%; }
+.print-title {
+    font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;
+    font-family: var(--font-jp); color: var(--text-primary);
+}
+.print-desc {
+    font-size: 0.78rem; color: var(--text-secondary);
+    margin-bottom: 0.8rem; font-family: var(--font-jp);
+}
+.print-source-btns {
+    display: flex; gap: 0.4rem; margin-bottom: 0.8rem; flex-wrap: wrap;
+}
+.print-source-btn {
+    padding: 0.3rem 0.7rem; border-radius: 6px; border: 1px solid var(--border-light);
+    background: var(--bg-card); color: var(--text-primary); font-size: 0.75rem;
+    font-family: var(--font-jp); cursor: pointer; transition: all 0.2s;
+}
+.print-source-btn.active {
+    background: var(--accent-teal); color: white; border-color: var(--accent-teal);
+}
+.print-list {
+    max-height: 280px; overflow-y: auto; border: 1px solid var(--border-light);
+    border-radius: 8px; margin-bottom: 1rem;
+}
+.print-item {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-light);
+    font-size: 0.8rem; font-family: var(--font-jp); color: var(--text-primary);
+    cursor: pointer; transition: background 0.15s;
+}
+.print-item:last-child { border-bottom: none; }
+.print-item:hover { background: var(--bg-hover); }
+.print-item input[type="checkbox"] { accent-color: var(--accent-teal); flex-shrink: 0; }
+.print-item-sim {
+    font-size: 0.7rem; color: var(--text-secondary); margin-left: auto; white-space: nowrap;
+}
+.print-selected-count {
+    font-size: 0.78rem; color: var(--text-secondary); font-family: var(--font-jp);
+    margin-bottom: 0.5rem;
+}
+.print-layout-row {
+    display: flex; gap: 0.5rem; margin-bottom: 1rem; align-items: center;
+}
+.print-layout-label {
+    font-size: 0.78rem; color: var(--text-primary); font-family: var(--font-jp);
+    white-space: nowrap;
+}
+.print-layout-select {
+    padding: 0.3rem 0.5rem; border-radius: 6px; border: 1px solid var(--border-light);
+    background: var(--bg-card); color: var(--text-primary); font-size: 0.78rem;
+    font-family: var(--font-jp);
+}
+.print-actions {
+    display: flex; gap: 0.5rem; justify-content: flex-end;
+}
+.print-go-btn {
+    padding: 0.5rem 1.2rem; border-radius: 8px; border: none;
+    background: var(--accent-teal); color: white; font-size: 0.85rem;
+    font-family: var(--font-jp); font-weight: 600; cursor: pointer;
+    transition: background 0.2s;
+}
+.print-go-btn:hover { background: #047857; }
+.print-go-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media print {
+    body * { visibility: hidden !important; }
+    #printArea, #printArea * { visibility: visible !important; }
+    #printArea {
+        position: absolute; left: 0; top: 0; width: 100%;
+        display: grid !important; padding: 8mm;
+        gap: 4mm;
+    }
+    #printArea.layout-1 { grid-template-columns: 1fr; }
+    #printArea.layout-2 { grid-template-columns: 1fr 1fr; }
+    #printArea.layout-4 { grid-template-columns: 1fr 1fr; }
+    .print-card {
+        border: 1px solid #ccc; border-radius: 6px; padding: 4mm;
+        page-break-inside: avoid; break-inside: avoid;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        background: white !important; color: #111 !important;
+    }
+    .print-card-title {
+        font-size: 11pt; font-weight: 700; margin-bottom: 2mm;
+        border-bottom: 1.5px solid #111; padding-bottom: 1.5mm;
+    }
+    .print-card-gen {
+        font-size: 7pt; color: #666; margin-bottom: 2mm;
+    }
+    .print-card-settings {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 1mm 3mm;
+    }
+    .print-card-row {
+        display: flex; gap: 1mm; font-size: 8pt; line-height: 1.4;
+    }
+    .print-card-label { font-weight: 600; white-space: nowrap; color: #333; }
+    .print-card-value { color: #111; }
+    @page { margin: 10mm; }
+}
+
 </style>
 </head>
 <body>
@@ -2894,6 +3020,12 @@ body.dark-theme .cal-entry-item { background: rgba(255,255,255,0.03); }
                     <span>おすすめ</span>
                 </button>
 
+                <button id="printBtn" class="dash-btn" title="印刷">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>印刷</span>
+                </button>
                 <button id="calBtn" class="dash-btn" title="カレンダー">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -3289,6 +3421,36 @@ body.dark-theme .cal-entry-item { background: rgba(255,255,255,0.03); }
             <div class="weather-results" id="weatherResults"></div>
         </div>
     </div>
+
+    <!-- Print Modal -->
+    <div class="print-overlay" id="printOverlay">
+        <div class="print-container">
+            <button class="print-close" id="printClose">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="print-title">印刷用レシピカード</div>
+            <div class="print-desc">印刷したいレシピを選択してください（最大8枚）</div>
+            <div class="print-source-btns">
+                <button class="print-source-btn active" data-source="all">すべて</button>
+                <button class="print-source-btn" data-source="favorites">お気に入り</button>
+                <button class="print-source-btn" data-source="myrecipes">マイレシピ</button>
+            </div>
+            <div class="print-list" id="printList"></div>
+            <div class="print-selected-count" id="printCount">0 件選択中</div>
+            <div class="print-layout-row">
+                <span class="print-layout-label">レイアウト:</span>
+                <select class="print-layout-select" id="printLayout">
+                    <option value="1">1枚 / ページ（大）</option>
+                    <option value="2" selected>2枚 / ページ</option>
+                    <option value="4">4枚 / ページ（小）</option>
+                </select>
+            </div>
+            <div class="print-actions">
+                <button class="print-go-btn" id="printGoBtn" disabled>印刷する</button>
+            </div>
+        </div>
+    </div>
+    <div id="printArea" style="display:none;"></div>
 
     <!-- Calendar Modal -->
     <div class="cal-overlay" id="calOverlay">
@@ -10851,6 +11013,8 @@ async function compressImage(dataUrl, maxWidth = 800) {
 // ===== Initialize Application =====
 async function init() {
     initDarkMode();
+    const savedSort = localStorage.getItem('fuji_sort_original');
+    if (savedSort) sortSelect.value = savedSort;
     loadFavorites();
     updateFavCounter();
     await openDB();
@@ -12674,65 +12838,330 @@ function populateCollFilter() {
     });
 }
 
-// ===== QR Code Generator (minimal, inline) =====
+// ===== QR Code Generator (real spec-compliant, self-contained; based on Kazuhiko Arase's qrcode.js, MIT) =====
 const QR = (() => {
-    function generate(text) {
-        const data = new TextEncoder().encode(text);
-        const size = data.length <= 106 ? 21 + 4 * (Math.ceil((data.length + 3) / 16)) : 25 + 4 * Math.ceil(data.length / 20);
-        const modules = Math.min(Math.max(size, 21), 177);
-        return encodeToCanvas(text, modules);
+    const MODE_8BIT_BYTE = 4;
+    const ECL = { L: 1, M: 0, Q: 3, H: 2 };
+
+    // Galois field math (GF(256))
+    const QRMath = (() => {
+        const EXP = new Array(256), LOG = new Array(256);
+        for (let i = 0; i < 8; i++) EXP[i] = 1 << i;
+        for (let i = 8; i < 256; i++) EXP[i] = EXP[i-4] ^ EXP[i-5] ^ EXP[i-6] ^ EXP[i-8];
+        for (let i = 0; i < 255; i++) LOG[EXP[i]] = i;
+        return {
+            glog(n) { if (n < 1) throw new Error('glog(' + n + ')'); return LOG[n]; },
+            gexp(n) { while (n < 0) n += 255; while (n >= 256) n -= 255; return EXP[n]; }
+        };
+    })();
+
+    function QRPolynomial(num, shift) {
+        let offset = 0;
+        while (offset < num.length && num[offset] === 0) offset++;
+        this.num = new Array(num.length - offset + shift);
+        for (let i = 0; i < num.length - offset; i++) this.num[i] = num[i + offset];
     }
-    function encodeToCanvas(text, size) {
-        const canvas = qrCanvas;
-        const ctx = canvas.getContext('2d');
-        const w = 256;
-        canvas.width = w;
-        canvas.height = w;
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, w, w);
-        ctx.fillStyle = '#000000';
-        const cellSize = Math.floor(w / (text.length < 50 ? 25 : text.length < 150 ? 33 : 41));
-        const qrSize = text.length < 50 ? 25 : text.length < 150 ? 33 : 41;
-        const offset = Math.floor((w - qrSize * cellSize) / 2);
-        const grid = generateGrid(text, qrSize);
-        for (let y = 0; y < qrSize; y++) {
-            for (let x = 0; x < qrSize; x++) {
-                if (grid[y * qrSize + x]) {
-                    ctx.fillRect(offset + x * cellSize, offset + y * cellSize, cellSize, cellSize);
+    QRPolynomial.prototype = {
+        get(i) { return this.num[i]; },
+        getLength() { return this.num.length; },
+        multiply(e) {
+            const num = new Array(this.getLength() + e.getLength() - 1).fill(0);
+            for (let i = 0; i < this.getLength(); i++)
+                for (let j = 0; j < e.getLength(); j++)
+                    num[i+j] ^= QRMath.gexp(QRMath.glog(this.get(i)) + QRMath.glog(e.get(j)));
+            return new QRPolynomial(num, 0);
+        },
+        mod(e) {
+            if (this.getLength() - e.getLength() < 0) return this;
+            const ratio = QRMath.glog(this.get(0)) - QRMath.glog(e.get(0));
+            const num = this.num.slice();
+            for (let i = 0; i < e.getLength(); i++) num[i] ^= QRMath.gexp(QRMath.glog(e.get(i)) + ratio);
+            return new QRPolynomial(num, 0).mod(e);
+        }
+    };
+
+    // Reed-Solomon block structure per version (1-15) x EC level (L,M,Q,H)
+    const RS_BLOCK_TABLE = [
+        [1,26,19],[1,26,16],[1,26,13],[1,26,9],
+        [1,44,34],[1,44,28],[1,44,22],[1,44,16],
+        [1,70,55],[1,70,44],[2,35,17],[2,35,13],
+        [1,100,80],[2,50,32],[2,50,24],[4,25,9],
+        [1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],
+        [2,86,68],[4,43,27],[4,43,19],[4,43,15],
+        [2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],
+        [2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],
+        [2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],
+        [2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],
+        [4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],
+        [2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],
+        [4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],
+        [3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],
+        [5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13]
+    ];
+    function getRSBlocks(typeNumber, ecl) {
+        const eclIdx = ecl === ECL.L ? 0 : ecl === ECL.M ? 1 : ecl === ECL.Q ? 2 : 3;
+        const rsBlock = RS_BLOCK_TABLE[(typeNumber - 1) * 4 + eclIdx];
+        if (!rsBlock) throw new Error('bad rs block @ typeNumber:' + typeNumber);
+        const length = rsBlock.length / 3;
+        const list = [];
+        for (let i = 0; i < length; i++) {
+            const count = rsBlock[i*3], totalCount = rsBlock[i*3+1], dataCount = rsBlock[i*3+2];
+            for (let j = 0; j < count; j++) list.push({ totalCount, dataCount });
+        }
+        return list;
+    }
+
+    const PATTERN_POSITION_TABLE = [
+        [], [6,18], [6,22], [6,26], [6,30], [6,34], [6,22,38], [6,24,42],
+        [6,26,46], [6,28,50], [6,30,54], [6,32,58], [6,34,62], [6,26,46,66], [6,26,48,70]
+    ];
+    const G15 = (1<<10)|(1<<8)|(1<<5)|(1<<4)|(1<<2)|(1<<1)|(1<<0);
+    const G18 = (1<<12)|(1<<11)|(1<<10)|(1<<9)|(1<<8)|(1<<5)|(1<<2)|(1<<0);
+    const G15_MASK = (1<<14)|(1<<12)|(1<<10)|(1<<4)|(1<<1);
+    function getBCHDigit(data) { let digit = 0; while (data !== 0) { digit++; data >>>= 1; } return digit; }
+    function getBCHTypeInfo(data) {
+        let d = data << 10;
+        while (getBCHDigit(d) - getBCHDigit(G15) >= 0) d ^= (G15 << (getBCHDigit(d) - getBCHDigit(G15)));
+        return ((data << 10) | d) ^ G15_MASK;
+    }
+    function getBCHTypeNumber(data) {
+        let d = data << 12;
+        while (getBCHDigit(d) - getBCHDigit(G18) >= 0) d ^= (G18 << (getBCHDigit(d) - getBCHDigit(G18)));
+        return (data << 12) | d;
+    }
+    function getMask(maskPattern, i, j) {
+        switch (maskPattern) {
+            case 0: return (i + j) % 2 === 0;
+            case 1: return i % 2 === 0;
+            case 2: return j % 3 === 0;
+            case 3: return (i + j) % 3 === 0;
+            case 4: return (Math.floor(i / 2) + Math.floor(j / 3)) % 2 === 0;
+            case 5: return (i * j) % 2 + (i * j) % 3 === 0;
+            case 6: return ((i * j) % 2 + (i * j) % 3) % 2 === 0;
+            case 7: return ((i * j) % 3 + (i + j) % 2) % 2 === 0;
+            default: throw new Error('bad maskPattern:' + maskPattern);
+        }
+    }
+    function getErrorCorrectPolynomial(len) {
+        let a = new QRPolynomial([1], 0);
+        for (let i = 0; i < len; i++) a = a.multiply(new QRPolynomial([1, QRMath.gexp(i)], 0));
+        return a;
+    }
+    function getLengthInBits(type) { return type < 10 ? 8 : 16; } // byte mode only
+    function getLostPoint(qr) {
+        const mc = qr.moduleCount;
+        let lost = 0;
+        for (let row = 0; row < mc; row++) for (let col = 0; col < mc; col++) {
+            let same = 0; const dark = qr.isDark(row, col);
+            for (let r = -1; r <= 1; r++) { if (row + r < 0 || mc <= row + r) continue;
+                for (let c = -1; c <= 1; c++) { if (col + c < 0 || mc <= col + c) continue;
+                    if (r === 0 && c === 0) continue;
+                    if (dark === qr.isDark(row + r, col + c)) same++;
+                } }
+            if (same > 5) lost += (3 + same - 5);
+        }
+        for (let row = 0; row < mc - 1; row++) for (let col = 0; col < mc - 1; col++) {
+            let count = 0;
+            if (qr.isDark(row, col)) count++;
+            if (qr.isDark(row + 1, col)) count++;
+            if (qr.isDark(row, col + 1)) count++;
+            if (qr.isDark(row + 1, col + 1)) count++;
+            if (count === 0 || count === 4) lost += 3;
+        }
+        for (let row = 0; row < mc; row++) for (let col = 0; col < mc - 6; col++) {
+            if (qr.isDark(row, col) && !qr.isDark(row, col+1) && qr.isDark(row, col+2) && qr.isDark(row, col+3) && qr.isDark(row, col+4) && !qr.isDark(row, col+5) && qr.isDark(row, col+6)) lost += 40;
+        }
+        for (let col = 0; col < mc; col++) for (let row = 0; row < mc - 6; row++) {
+            if (qr.isDark(row, col) && !qr.isDark(row+1, col) && qr.isDark(row+2, col) && qr.isDark(row+3, col) && qr.isDark(row+4, col) && !qr.isDark(row+5, col) && qr.isDark(row+6, col)) lost += 40;
+        }
+        let dc = 0;
+        for (let col = 0; col < mc; col++) for (let row = 0; row < mc; row++) if (qr.isDark(row, col)) dc++;
+        const ratio = Math.abs(100 * dc / mc / mc - 50) / 5;
+        lost += ratio * 10;
+        return lost;
+    }
+
+    function QRBitBuffer() { this.buffer = []; this.length = 0; }
+    QRBitBuffer.prototype = {
+        put(num, length) { for (let i = 0; i < length; i++) this.putBit(((num >>> (length - i - 1)) & 1) === 1); },
+        putBit(bit) {
+            const bufIndex = Math.floor(this.length / 8);
+            if (this.buffer.length <= bufIndex) this.buffer.push(0);
+            if (bit) this.buffer[bufIndex] |= (0x80 >>> (this.length % 8));
+            this.length++;
+        }
+    };
+
+    const PAD0 = 0xEC, PAD1 = 0x11;
+    function createData(typeNumber, ecl, dataBytes) {
+        const rsBlocks = getRSBlocks(typeNumber, ecl);
+        const buffer = new QRBitBuffer();
+        buffer.put(MODE_8BIT_BYTE, 4);
+        buffer.put(dataBytes.length, getLengthInBits(typeNumber));
+        for (let i = 0; i < dataBytes.length; i++) buffer.put(dataBytes[i], 8);
+        let totalDataCount = 0;
+        for (let i = 0; i < rsBlocks.length; i++) totalDataCount += rsBlocks[i].dataCount;
+        if (buffer.length > totalDataCount * 8) throw new Error('code length overflow');
+        if (buffer.length + 4 <= totalDataCount * 8) buffer.put(0, 4);
+        while (buffer.length % 8 !== 0) buffer.putBit(false);
+        while (true) {
+            if (buffer.length >= totalDataCount * 8) break;
+            buffer.put(PAD0, 8);
+            if (buffer.length >= totalDataCount * 8) break;
+            buffer.put(PAD1, 8);
+        }
+        return createBytes(buffer, rsBlocks);
+    }
+    function createBytes(buffer, rsBlocks) {
+        let offset = 0, maxDc = 0, maxEc = 0;
+        const dcdata = new Array(rsBlocks.length), ecdata = new Array(rsBlocks.length);
+        for (let r = 0; r < rsBlocks.length; r++) {
+            const dcCount = rsBlocks[r].dataCount, ecCount = rsBlocks[r].totalCount - dcCount;
+            maxDc = Math.max(maxDc, dcCount); maxEc = Math.max(maxEc, ecCount);
+            dcdata[r] = new Array(dcCount);
+            for (let i = 0; i < dcCount; i++) dcdata[r][i] = 0xff & buffer.buffer[i + offset];
+            offset += dcCount;
+            const rsPoly = getErrorCorrectPolynomial(ecCount);
+            const rawPoly = new QRPolynomial(dcdata[r], rsPoly.getLength() - 1);
+            const modPoly = rawPoly.mod(rsPoly);
+            ecdata[r] = new Array(rsPoly.getLength() - 1);
+            for (let i = 0; i < ecdata[r].length; i++) {
+                const modIndex = i + modPoly.getLength() - ecdata[r].length;
+                ecdata[r][i] = modIndex >= 0 ? modPoly.get(modIndex) : 0;
+            }
+        }
+        let total = 0;
+        for (let i = 0; i < rsBlocks.length; i++) total += rsBlocks[i].totalCount;
+        const data = new Array(total);
+        let index = 0;
+        for (let i = 0; i < maxDc; i++) for (let r = 0; r < rsBlocks.length; r++) if (i < dcdata[r].length) data[index++] = dcdata[r][i];
+        for (let i = 0; i < maxEc; i++) for (let r = 0; r < rsBlocks.length; r++) if (i < ecdata[r].length) data[index++] = ecdata[r][i];
+        return data;
+    }
+
+    function QRCodeModel(typeNumber, ecl, dataBytes) {
+        this.typeNumber = typeNumber;
+        this.ecl = ecl;
+        this.dataBytes = dataBytes;
+        this.modules = null;
+        this.moduleCount = 0;
+        this.dataCache = null;
+    }
+    QRCodeModel.prototype = {
+        isDark(row, col) { return this.modules[row][col]; },
+        make() { this.makeImpl(false, this.getBestMaskPattern()); },
+        makeImpl(test, maskPattern) {
+            this.moduleCount = this.typeNumber * 4 + 17;
+            this.modules = [];
+            for (let row = 0; row < this.moduleCount; row++) this.modules.push(new Array(this.moduleCount).fill(null));
+            this.setupProbe(0, 0); this.setupProbe(this.moduleCount - 7, 0); this.setupProbe(0, this.moduleCount - 7);
+            this.setupAdjust(); this.setupTiming(); this.setupTypeInfo(test, maskPattern);
+            if (this.typeNumber >= 7) this.setupTypeNumber(test);
+            if (this.dataCache == null) this.dataCache = createData(this.typeNumber, this.ecl, this.dataBytes);
+            this.mapData(this.dataCache, maskPattern);
+        },
+        setupProbe(row, col) {
+            for (let r = -1; r <= 7; r++) { if (row + r <= -1 || this.moduleCount <= row + r) continue;
+                for (let c = -1; c <= 7; c++) { if (col + c <= -1 || this.moduleCount <= col + c) continue;
+                    this.modules[row + r][col + c] =
+                        (0 <= r && r <= 6 && (c === 0 || c === 6)) || (0 <= c && c <= 6 && (r === 0 || r === 6)) || (2 <= r && r <= 4 && 2 <= c && c <= 4);
+                } }
+        },
+        setupTiming() {
+            for (let r = 8; r < this.moduleCount - 8; r++) if (this.modules[r][6] == null) this.modules[r][6] = (r % 2 === 0);
+            for (let c = 8; c < this.moduleCount - 8; c++) if (this.modules[6][c] == null) this.modules[6][c] = (c % 2 === 0);
+        },
+        setupAdjust() {
+            const pos = PATTERN_POSITION_TABLE[this.typeNumber - 1];
+            for (let i = 0; i < pos.length; i++) for (let j = 0; j < pos.length; j++) {
+                const row = pos[i], col = pos[j];
+                if (this.modules[row][col] != null) continue;
+                for (let r = -2; r <= 2; r++) for (let c = -2; c <= 2; c++)
+                    this.modules[row + r][col + c] = (r === -2 || r === 2 || c === -2 || c === 2 || (r === 0 && c === 0));
+            }
+        },
+        setupTypeNumber(test) {
+            const bits = getBCHTypeNumber(this.typeNumber);
+            for (let i = 0; i < 18; i++) { const mod = !test && ((bits >> i) & 1) === 1; this.modules[Math.floor(i / 3)][i % 3 + this.moduleCount - 8 - 3] = mod; }
+            for (let i = 0; i < 18; i++) { const mod = !test && ((bits >> i) & 1) === 1; this.modules[i % 3 + this.moduleCount - 8 - 3][Math.floor(i / 3)] = mod; }
+        },
+        setupTypeInfo(test, maskPattern) {
+            const data = (this.ecl << 3) | maskPattern;
+            const bits = getBCHTypeInfo(data);
+            for (let i = 0; i < 15; i++) { const mod = !test && ((bits >> i) & 1) === 1;
+                if (i < 6) this.modules[i][8] = mod; else if (i < 8) this.modules[i + 1][8] = mod; else this.modules[this.moduleCount - 15 + i][8] = mod;
+            }
+            for (let i = 0; i < 15; i++) { const mod = !test && ((bits >> i) & 1) === 1;
+                if (i < 8) this.modules[8][this.moduleCount - i - 1] = mod; else if (i < 9) this.modules[8][15 - i - 1 + 1] = mod; else this.modules[8][15 - i - 1] = mod;
+            }
+            this.modules[this.moduleCount - 8][8] = !test;
+        },
+        mapData(data, maskPattern) {
+            let inc = -1, row = this.moduleCount - 1, bitIndex = 7, byteIndex = 0;
+            for (let col = this.moduleCount - 1; col > 0; col -= 2) {
+                if (col === 6) col--;
+                while (true) {
+                    for (let c = 0; c < 2; c++) {
+                        if (this.modules[row][col - c] == null) {
+                            let dark = false;
+                            if (byteIndex < data.length) dark = ((data[byteIndex] >>> bitIndex) & 1) === 1;
+                            if (getMask(maskPattern, row, col - c)) dark = !dark;
+                            this.modules[row][col - c] = dark;
+                            bitIndex--;
+                            if (bitIndex === -1) { byteIndex++; bitIndex = 7; }
+                        }
+                    }
+                    row += inc;
+                    if (row < 0 || this.moduleCount <= row) { row -= inc; inc = -inc; break; }
                 }
             }
+        },
+        getBestMaskPattern() {
+            let minLost = 0, pattern = 0;
+            for (let i = 0; i < 8; i++) {
+                this.makeImpl(true, i);
+                const lost = getLostPoint(this);
+                if (i === 0 || minLost > lost) { minLost = lost; pattern = i; }
+            }
+            return pattern;
+        }
+    };
+
+    function generate(text) {
+        const bytes = Array.from(new TextEncoder().encode(text));
+        let model = null;
+        for (const level of [ECL.M, ECL.L]) {
+            for (let type = 1; type <= 15; type++) {
+                try {
+                    const m = new QRCodeModel(type, level, bytes);
+                    m.make();
+                    model = m; break;
+                } catch (e) { model = null; }
+            }
+            if (model) break;
+        }
+        if (!model) throw new Error('QR data too long');
+        drawToCanvas(model);
+    }
+
+    function drawToCanvas(model) {
+        const count = model.moduleCount;
+        const quiet = 4;
+        const total = count + quiet * 2;
+        const canvas = qrCanvas;
+        const scale = Math.max(2, Math.floor(320 / total));
+        const px = scale * total;
+        canvas.width = px; canvas.height = px;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, px, px);
+        ctx.fillStyle = '#000000';
+        for (let r = 0; r < count; r++) for (let c = 0; c < count; c++) {
+            if (model.isDark(r, c)) ctx.fillRect((c + quiet) * scale, (r + quiet) * scale, scale, scale);
         }
         return canvas;
     }
-    function generateGrid(text, size) {
-        const grid = new Uint8Array(size * size);
-        let seed = 0;
-        for (let i = 0; i < text.length; i++) seed = (seed * 31 + text.charCodeAt(i)) & 0x7fffffff;
-        function addPattern(cx, cy, s) {
-            for (let dy = -s; dy <= s; dy++) for (let dx = -s; dx <= s; dx++) {
-                const x = cx + dx, y = cy + dy;
-                if (x >= 0 && x < size && y >= 0 && y < size) {
-                    grid[y * size + x] = (Math.abs(dx) === s || Math.abs(dy) === s || (Math.abs(dx) <= 1 && Math.abs(dy) <= 1)) ? 1 : 0;
-                }
-            }
-        }
-        addPattern(3, 3, 3);
-        addPattern(size - 4, 3, 3);
-        addPattern(3, size - 4, 3);
-        for (let i = 8; i < size - 8; i++) { grid[6 * size + i] = i % 2 === 0 ? 1 : 0; grid[i * size + 6] = i % 2 === 0 ? 1 : 0; }
-        for (let i = 0; i < text.length; i++) {
-            const code = text.charCodeAt(i);
-            for (let b = 0; b < 8; b++) {
-                const idx = 8 * size + 8 + (i * 8 + b);
-                const x = idx % size, y = Math.floor(idx / size);
-                if (x < size && y < size && !grid[y * size + x]) {
-                    const rng = (seed = (seed * 1103515245 + 12345) & 0x7fffffff);
-                    grid[y * size + x] = ((code >> (7 - b)) & 1) ^ (rng & 1);
-                }
-            }
-        }
-        return grid;
-    }
+
     return { generate };
 })();
 
@@ -12946,6 +13375,92 @@ function showCalEntries(dateStr) {
     });
 }
 
+// ===== Print Recipe Cards =====
+let printSelected = new Set();
+let printSource = 'all';
+
+function openPrintModal() {
+    printSelected.clear();
+    printSource = 'all';
+    document.querySelectorAll('.print-source-btn').forEach(b => b.classList.toggle('active', b.dataset.source === 'all'));
+    renderPrintList();
+    printOverlay.classList.add('open');
+}
+
+function renderPrintList() {
+    const favs = getFavorites();
+    let recipes;
+    if (printSource === 'favorites') {
+        recipes = getCombinedRecipes().filter(r => favs.includes(r.id));
+    } else if (printSource === 'myrecipes') {
+        recipes = myRecipes.map(r => ({ ...r, isMyRecipe: true }));
+    } else {
+        recipes = getCombinedRecipes();
+    }
+
+    const list = document.getElementById('printList');
+    if (recipes.length === 0) {
+        list.innerHTML = '<div style="padding:1rem;text-align:center;color:var(--text-secondary);font-size:0.8rem;font-family:var(--font-jp)">レシピがありません</div>';
+        return;
+    }
+    list.innerHTML = recipes.map(r => {
+        const sim = (r.settings.film_simulation || '').replace(/&nbsp;/g, ' ').trim();
+        const checked = printSelected.has(r.id) ? 'checked' : '';
+        return `<label class="print-item"><input type="checkbox" value="${r.id}" ${checked}><span>${r.title}</span><span class="print-item-sim">${sim}</span></label>`;
+    }).join('');
+
+    list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', () => {
+            if (cb.checked) {
+                if (printSelected.size >= 8) { cb.checked = false; return; }
+                printSelected.add(cb.value);
+            } else {
+                printSelected.delete(cb.value);
+            }
+            updatePrintCount();
+        });
+    });
+    updatePrintCount();
+}
+
+function updatePrintCount() {
+    document.getElementById('printCount').textContent = printSelected.size + ' 件選択中' + (printSelected.size >= 8 ? '（最大）' : '');
+    document.getElementById('printGoBtn').disabled = printSelected.size === 0;
+}
+
+function executePrint() {
+    const combined = getCombinedRecipes();
+    const selected = combined.filter(r => printSelected.has(r.id));
+    if (selected.length === 0) return;
+
+    const layout = document.getElementById('printLayout').value;
+    const settingsLabels = [
+        ['film_simulation', 'Film Simulation'], ['dynamic_range', 'Dynamic Range'],
+        ['grain_effect', 'Grain Effect'], ['color_chrome_effect', 'Color Chrome'],
+        ['color_chrome_fx_blue', 'CC Blue'], ['white_balance', 'White Balance'],
+        ['highlight_tone', 'Highlight'], ['shadow_tone', 'Shadow'],
+        ['color', 'Color'], ['sharpness', 'Sharpness'],
+        ['noise_reduction', 'Noise Reduction'], ['clarity', 'Clarity'],
+        ['exposure_compensation', 'Exposure Comp']
+    ];
+
+    const printArea = document.getElementById('printArea');
+    printArea.className = 'layout-' + layout;
+    printArea.innerHTML = selected.map(r => {
+        const rows = settingsLabels
+            .filter(([k]) => r.settings[k] && r.settings[k].trim())
+            .map(([k, label]) => `<div class="print-card-row"><span class="print-card-label">${label}:</span><span class="print-card-value">${r.settings[k].replace(/&nbsp;/g, ' ').trim()}</span></div>`)
+            .join('');
+        return `<div class="print-card"><div class="print-card-title">${r.title}</div><div class="print-card-gen">${r.generation || ''}</div><div class="print-card-settings">${rows}</div></div>`;
+    }).join('');
+
+    printArea.style.display = 'grid';
+    printOverlay.classList.remove('open');
+    setTimeout(() => { window.print(); printArea.style.display = 'none'; }, 100);
+}
+
+const printOverlay = document.getElementById('printOverlay');
+
 // Event Listeners setup
 function setupEventListeners() {
     searchInput.addEventListener('input', () => {
@@ -12999,7 +13514,10 @@ function setupEventListeners() {
     memoSaveBtn.addEventListener('click', saveMemoForRecipe);
     randomRecipeBtn.addEventListener('click', openRandomRecipe);
     darkModeToggle.addEventListener('click', toggleDarkMode);
-    sortSelect.addEventListener('change', renderRecipes);
+    sortSelect.addEventListener('change', () => {
+        localStorage.setItem('fuji_sort_original', sortSelect.value);
+        renderRecipes();
+    });
 
     document.getElementById('dashBtn').addEventListener('click', openDashboard);
     document.getElementById('dashClose').addEventListener('click', () => dashOverlay.classList.remove('open'));
@@ -13049,6 +13567,20 @@ function setupEventListeners() {
         handleImageFiles(e.dataTransfer.files);
     });
 
+    // Print
+    document.getElementById('printBtn').addEventListener('click', openPrintModal);
+    document.getElementById('printClose').addEventListener('click', () => printOverlay.classList.remove('open'));
+    printOverlay.addEventListener('click', (e) => { if (e.target === printOverlay) printOverlay.classList.remove('open'); });
+    document.getElementById('printGoBtn').addEventListener('click', executePrint);
+    document.querySelectorAll('.print-source-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.print-source-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            printSource = btn.dataset.source;
+            renderPrintList();
+        });
+    });
+
     // QR
     document.getElementById('qrClose').addEventListener('click', () => qrOverlay.classList.remove('open'));
     qrOverlay.addEventListener('click', (e) => { if (e.target === qrOverlay) qrOverlay.classList.remove('open'); });
@@ -13072,7 +13604,8 @@ function setupEventListeners() {
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            if (qrOverlay.classList.contains('open')) { qrOverlay.classList.remove('open'); }
+            if (printOverlay.classList.contains('open')) { printOverlay.classList.remove('open'); }
+            else if (qrOverlay.classList.contains('open')) { qrOverlay.classList.remove('open'); }
             else if (weatherOverlay.classList.contains('open')) { weatherOverlay.classList.remove('open'); }
             else if (calOverlay.classList.contains('open')) { calOverlay.classList.remove('open'); }
             else if (createModal.classList.contains('open')) { closeCreateModal(); }
