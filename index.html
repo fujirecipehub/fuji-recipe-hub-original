@@ -971,6 +971,84 @@ body.font-large { --font-size-base: 18px; }
     transition: opacity 0.5s;
 }
 
+/* ===== Filter Dropdowns ===== */
+.filter-dropdowns {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 0 0 0.25rem;
+}
+.filter-dropdown {
+    position: relative;
+    flex-shrink: 0;
+}
+.filter-dropdown select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--border-color);
+    padding: 0.45rem 2rem 0.45rem 0.75rem;
+    font-size: 0.8rem;
+    font-family: var(--font-jp);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.filter-dropdown select:focus {
+    outline: none;
+    border-color: var(--accent-orange);
+    box-shadow: 0 0 0 2px rgba(212, 83, 29, 0.15);
+}
+.filter-dropdown select.active-filter {
+    background: rgba(212, 83, 29, 0.08);
+    border-color: rgba(212, 83, 29, 0.3);
+    color: var(--accent-orange);
+    font-weight: 500;
+}
+.filter-dropdown::after {
+    content: '';
+    position: absolute;
+    right: 0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid var(--text-muted);
+    pointer-events: none;
+}
+.filter-reset-btn {
+    display: none;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(220, 38, 38, 0.08);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    padding: 0.45rem 0.75rem;
+    font-size: 0.75rem;
+    font-family: var(--font-jp);
+    border-radius: 8px;
+    color: var(--danger-red);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    white-space: nowrap;
+}
+.filter-reset-btn:hover {
+    background: rgba(220, 38, 38, 0.15);
+}
+.filter-reset-btn svg {
+    width: 14px;
+    height: 14px;
+}
+.filter-reset-btn.visible {
+    display: inline-flex;
+}
+
 /* ===== My Recipe Tab & Create Button ===== */
 .tab-btn-my {
     background: rgba(139, 105, 20, 0.08) !important;
@@ -1447,6 +1525,30 @@ body.font-large { --font-size-base: 18px; }
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
+                </button>
+            </div>
+
+            <div class="filter-dropdowns" id="filterDropdowns">
+                <div class="filter-dropdown">
+                    <select id="filterFilmSim">
+                        <option value="">フィルムシミュレーション</option>
+                    </select>
+                </div>
+                <div class="filter-dropdown">
+                    <select id="filterWB">
+                        <option value="">ホワイトバランス</option>
+                    </select>
+                </div>
+                <div class="filter-dropdown">
+                    <select id="filterDR">
+                        <option value="">ダイナミックレンジ</option>
+                    </select>
+                </div>
+                <button id="filterResetBtn" class="filter-reset-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    リセット
                 </button>
             </div>
 
@@ -8976,6 +9078,11 @@ const favCountEl = document.getElementById('favCount');
 const resultCountEl = document.getElementById('resultCount');
 const recipeGrid = document.getElementById('recipeGrid');
 
+const filterFilmSim = document.getElementById('filterFilmSim');
+const filterWB = document.getElementById('filterWB');
+const filterDR = document.getElementById('filterDR');
+const filterResetBtn = document.getElementById('filterResetBtn');
+
 // Modal Elements
 const recipeModal = document.getElementById('recipeModal');
 const modalClose = document.getElementById('modalClose');
@@ -9256,6 +9363,7 @@ async function fetchRecipes() {
             id: `recipe-${index}`,
             ...recipe
         }));
+        populateFilters();
         renderRecipes();
     } catch (error) {
         console.error('Error loading recipes:', error);
@@ -9277,9 +9385,57 @@ function getCombinedRecipes() {
     return [...allRecipes, ...myMapped];
 }
 
+function extractWBBase(wb) {
+    if (!wb) return '';
+    return wb.replace(/&nbsp;/g, ' ').replace(/,.*$/, '').replace(/[+-]\d+\s*Red.*$/i, '').trim();
+}
+
+function populateFilters() {
+    const combined = getCombinedRecipes();
+    const sims = new Set();
+    const wbs = new Set();
+    const drs = new Set();
+
+    combined.forEach(r => {
+        const sim = (r.settings.film_simulation || '').replace(/&nbsp;/g, ' ').trim();
+        if (sim) sims.add(sim);
+        const wb = extractWBBase(r.settings.white_balance || '');
+        if (wb) wbs.add(wb);
+        const dr = (r.settings.dynamic_range || '').replace(/&nbsp;/g, ' ').trim();
+        if (dr) drs.add(dr);
+    });
+
+    const prevSim = filterFilmSim.value;
+    const prevWB = filterWB.value;
+    const prevDR = filterDR.value;
+
+    const fill = (sel, items, placeholder, prev) => {
+        sel.innerHTML = '<option value="">' + placeholder + '</option>';
+        [...items].sort((a, b) => a.localeCompare(b, 'ja')).forEach(v => {
+            sel.innerHTML += '<option value="' + v.replace(/"/g, '&quot;') + '">' + v + '</option>';
+        });
+        if (prev && [...items].includes(prev)) sel.value = prev;
+    };
+
+    fill(filterFilmSim, sims, 'フィルムシミュレーション', prevSim);
+    fill(filterWB, wbs, 'ホワイトバランス', prevWB);
+    fill(filterDR, drs, 'ダイナミックレンジ', prevDR);
+}
+
+function updateFilterStyles() {
+    const any = filterFilmSim.value || filterWB.value || filterDR.value;
+    filterFilmSim.classList.toggle('active-filter', !!filterFilmSim.value);
+    filterWB.classList.toggle('active-filter', !!filterWB.value);
+    filterDR.classList.toggle('active-filter', !!filterDR.value);
+    filterResetBtn.classList.toggle('visible', !!any);
+}
+
 // Render Recipe Cards Grid
 function renderRecipes() {
     const query = searchInput.value.toLowerCase().trim();
+    const selSim = filterFilmSim.value;
+    const selWB = filterWB.value;
+    const selDR = filterDR.value;
     const combined = getCombinedRecipes();
 
     const filteredRecipes = combined.filter(recipe => {
@@ -9291,6 +9447,19 @@ function renderRecipes() {
         }
 
         if (showFavoritesOnly && !favorites.has(recipe.id)) return false;
+
+        if (selSim) {
+            const sim = (recipe.settings.film_simulation || '').replace(/&nbsp;/g, ' ').trim();
+            if (sim !== selSim) return false;
+        }
+        if (selWB) {
+            const wb = extractWBBase(recipe.settings.white_balance || '');
+            if (wb !== selWB) return false;
+        }
+        if (selDR) {
+            const dr = (recipe.settings.dynamic_range || '').replace(/&nbsp;/g, ' ').trim();
+            if (dr !== selDR) return false;
+        }
 
         if (query) {
             const inTitle = recipe.title.toLowerCase().includes(query);
@@ -10202,6 +10371,7 @@ async function saveMyRecipe() {
     await dbPut(recipe);
     await loadMyRecipes();
     closeCreateModal();
+    populateFilters();
     renderRecipes();
 }
 
@@ -10214,6 +10384,7 @@ async function deleteMyRecipe() {
     updateFavCounter();
     await loadMyRecipes();
     closeCreateModal();
+    populateFilters();
     renderRecipes();
 }
 
@@ -10525,6 +10696,21 @@ function setupEventListeners() {
     favToggleBtn.addEventListener('click', () => {
         showFavoritesOnly = !showFavoritesOnly;
         favToggleBtn.classList.toggle('active', showFavoritesOnly);
+        renderRecipes();
+    });
+
+    [filterFilmSim, filterWB, filterDR].forEach(sel => {
+        sel.addEventListener('change', () => {
+            updateFilterStyles();
+            renderRecipes();
+        });
+    });
+
+    filterResetBtn.addEventListener('click', () => {
+        filterFilmSim.value = '';
+        filterWB.value = '';
+        filterDR.value = '';
+        updateFilterStyles();
         renderRecipes();
     });
 
