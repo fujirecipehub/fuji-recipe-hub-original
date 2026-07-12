@@ -1758,6 +1758,218 @@ body.dark-theme .exif-notice {
     color: #6ee7b7;
 }
 
+/* ===== Sort Controls ===== */
+.sort-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.sort-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+.sort-dropdown {
+    position: relative;
+}
+.sort-dropdown select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--border-color);
+    padding: 0.4rem 2rem 0.4rem 0.7rem;
+    font-size: 0.8rem;
+    font-family: var(--font-jp);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+.sort-dropdown select:focus {
+    outline: none;
+    border-color: var(--accent-orange);
+}
+.sort-dropdown::after {
+    content: '';
+    position: absolute;
+    right: 0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid var(--text-muted);
+    pointer-events: none;
+}
+body.dark-theme .sort-dropdown select {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* ===== Similar Recipes ===== */
+.similar-recipes {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+.similar-recipes-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-family: var(--font-outfit);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.6rem;
+}
+.similar-recipes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+.similar-recipe-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.7rem;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+.similar-recipe-item:hover {
+    background: var(--bg-surface-hover);
+    border-color: var(--border-color-hover);
+}
+.similar-recipe-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+.similar-recipe-name {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.similar-recipe-sim {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+.similar-recipe-arrow {
+    width: 14px;
+    height: 14px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+body.dark-theme .similar-recipe-item {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* ===== Scene Tags ===== */
+.scene-tags-section {
+    margin-top: 0.75rem;
+}
+.scene-tags-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+}
+.scene-tags-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+.scene-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.72rem;
+    font-family: var(--font-jp);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid var(--border-color);
+    background: rgba(0, 0, 0, 0.03);
+    color: var(--text-secondary);
+}
+.scene-tag:hover {
+    border-color: var(--accent-orange);
+    color: var(--accent-orange);
+}
+.scene-tag.active {
+    background: var(--accent-orange);
+    border-color: var(--accent-orange);
+    color: white;
+}
+.scene-tag .tag-remove {
+    display: none;
+    font-size: 0.85rem;
+    line-height: 1;
+    margin-left: 0.1rem;
+}
+.scene-tag.active .tag-remove {
+    display: inline;
+}
+.card-scene-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+    margin-top: 0.25rem;
+}
+.card-scene-tag {
+    font-size: 0.65rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 10px;
+    background: rgba(212, 83, 29, 0.08);
+    color: var(--accent-orange);
+    border: 1px solid rgba(212, 83, 29, 0.15);
+}
+body.dark-theme .scene-tag {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* ===== Filter by Tag (in filter dropdowns area) ===== */
+.tag-filter-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    align-items: center;
+}
+.tag-filter-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-right: 0.2rem;
+    white-space: nowrap;
+}
+.tag-filter-btn {
+    display: inline-flex;
+    padding: 0.25rem 0.55rem;
+    font-size: 0.72rem;
+    font-family: var(--font-jp);
+    border-radius: 20px;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background: rgba(0, 0, 0, 0.03);
+    color: var(--text-secondary);
+    transition: all 0.15s;
+}
+.tag-filter-btn:hover {
+    border-color: var(--accent-orange);
+    color: var(--accent-orange);
+}
+.tag-filter-btn.active {
+    background: var(--accent-orange);
+    border-color: var(--accent-orange);
+    color: white;
+}
+body.dark-theme .tag-filter-btn {
+    background: rgba(255, 255, 255, 0.04);
+}
+
 </style>
 </head>
 <body>
@@ -1877,6 +2089,23 @@ body.dark-theme .exif-notice {
         <!-- Stats Area -->
         <div class="stats-panel">
             <span id="resultCount">レシピを読み込み中...</span>
+            <div style="margin-left:auto; display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+                <div class="sort-controls">
+                    <span class="sort-label">並べ替え:</span>
+                    <div class="sort-dropdown">
+                        <select id="sortSelect">
+                            <option value="default">デフォルト</option>
+                            <option value="name-asc">名前 A→Z</option>
+                            <option value="name-desc">名前 Z→A</option>
+                            <option value="sim">フィルムシミュレーション</option>
+                            <option value="rating-desc">★評価 高→低</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tag-filter-wrap" id="tagFilterWrap">
+            <span class="tag-filter-label">シーン:</span>
         </div>
 
         <!-- Recipe Grid -->
@@ -1949,8 +2178,17 @@ body.dark-theme .exif-notice {
                                     <input type="radio" name="rating" id="star1" value="1"><label for="star1">&#9733;</label>
                                 </div>
                             </div>
+                            <div class="scene-tags-section">
+                                <div class="scene-tags-label">シーンタグ</div>
+                                <div class="scene-tags-wrap" id="sceneTagsWrap"></div>
+                            </div>
                             <textarea class="memo-textarea" id="memoTextarea" placeholder="撮影メモ（例: 晴天の屋外で最高、夕方のゴールデンアワーに合う）"></textarea>
                             <button class="memo-save-btn" id="memoSaveBtn">保存</button>
+                        </div>
+
+                        <div class="similar-recipes" id="similarRecipes">
+                            <div class="similar-recipes-title">SIMILAR RECIPES</div>
+                            <div class="similar-recipes-list" id="similarRecipesList"></div>
                         </div>
                     </div>
                 </div>
@@ -9374,7 +9612,14 @@ const darkModeToggle = document.getElementById('darkModeToggle');
 const memoTextarea = document.getElementById('memoTextarea');
 const memoSaveBtn = document.getElementById('memoSaveBtn');
 const starRating = document.getElementById('starRating');
+const sortSelect = document.getElementById('sortSelect');
+const sceneTagsWrap = document.getElementById('sceneTagsWrap');
+const similarRecipesList = document.getElementById('similarRecipesList');
+const tagFilterWrap = document.getElementById('tagFilterWrap');
 let currentModalRecipeId = null;
+let activeTagFilter = '';
+
+const SCENE_TAGS = ['ポートレート', '風景', 'スナップ', '夜景', 'ストリート', '旅行', '食べ物', 'モノクロ', '日常', 'フィルムライク'];
 
 // Modal Elements
 const recipeModal = document.getElementById('recipeModal');
@@ -9658,6 +9903,7 @@ async function fetchRecipes() {
             ...recipe
         }));
         populateFilters();
+        populateTagFilter();
         renderRecipes();
     } catch (error) {
         console.error('Error loading recipes:', error);
@@ -9768,8 +10014,27 @@ function renderRecipes() {
             return inTitle || inSim || inSettings;
         }
 
+        if (activeTagFilter) {
+            const sceneTags = getSceneTags();
+            const recipeTags = sceneTags[recipe.id] || [];
+            if (!recipeTags.includes(activeTagFilter)) return false;
+        }
+
         return true;
     });
+
+    // Sort
+    const sortVal = sortSelect.value;
+    if (sortVal === 'name-asc') {
+        filteredRecipes.sort((a, b) => a.title.localeCompare(b.title, 'ja'));
+    } else if (sortVal === 'name-desc') {
+        filteredRecipes.sort((a, b) => b.title.localeCompare(a.title, 'ja'));
+    } else if (sortVal === 'sim') {
+        filteredRecipes.sort((a, b) => (a.settings.film_simulation || '').localeCompare(b.settings.film_simulation || '', 'ja'));
+    } else if (sortVal === 'rating-desc') {
+        const memoAll = getMemos();
+        filteredRecipes.sort((a, b) => ((memoAll[b.id] || {}).rating || 0) - ((memoAll[a.id] || {}).rating || 0));
+    }
 
     if (filteredRecipes.length === 0) {
         const emptyMsg = currentFilter === 'myrecipe'
@@ -9787,12 +10052,14 @@ function renderRecipes() {
     resultCountEl.textContent = `${filteredRecipes.length} 件のレシピが見つかりました`;
 
     const memos = getMemos();
+    const allSceneTags = getSceneTags();
 
     recipeGrid.innerHTML = filteredRecipes.map(recipe => {
         const isFav = favorites.has(recipe.id);
         const isMyRecipe = recipe.isMyRecipe;
         const userPhotos = recipePhotos[recipe.id];
         const memoData = memos[recipe.id];
+        const recipeTags = allSceneTags[recipe.id] || [];
 
         let imageHtml;
         if (isMyRecipe && recipe.images && recipe.images.length > 0) {
@@ -9842,6 +10109,7 @@ function renderRecipes() {
                         </div>
                         <h3 class="card-title">${recipe.title}</h3>
                     </div>
+                    ${recipeTags.length > 0 ? '<div class="card-scene-tags">' + recipeTags.map(t => '<span class="card-scene-tag">' + t + '</span>').join('') + '</div>' : ''}
                     <div class="card-bottom">
                         <span class="card-sim">${baseSim}</span>
                         ${memoData && memoData.rating ? '<span style="color:#f59e0b;font-size:0.85rem;">' + '&#9733;'.repeat(memoData.rating) + '</span>' : ''}
@@ -10062,6 +10330,8 @@ function openModal(recipe) {
 
     currentModalRecipeId = recipe.id;
     loadMemoForRecipe(recipe.id);
+    renderSceneTagsForRecipe(recipe.id);
+    renderSimilarRecipes(recipe);
 
     recipeModal.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -10971,6 +11241,128 @@ function updateFavCounter() {
     favCountEl.textContent = favorites.size;
 }
 
+// ===== Scene Tags =====
+function getSceneTags() {
+    try { return JSON.parse(localStorage.getItem('fuji_scene_tags_original') || '{}'); }
+    catch { return {}; }
+}
+
+function saveSceneTags(tags) {
+    localStorage.setItem('fuji_scene_tags_original', JSON.stringify(tags));
+}
+
+function renderSceneTagsForRecipe(recipeId) {
+    const tags = getSceneTags();
+    const active = tags[recipeId] || [];
+    sceneTagsWrap.innerHTML = SCENE_TAGS.map(tag => {
+        const isActive = active.includes(tag);
+        return `<span class="scene-tag ${isActive ? 'active' : ''}" data-tag="${tag}">${tag}<span class="tag-remove">&times;</span></span>`;
+    }).join('');
+
+    sceneTagsWrap.querySelectorAll('.scene-tag').forEach(el => {
+        el.addEventListener('click', () => {
+            const tag = el.dataset.tag;
+            const tags = getSceneTags();
+            const list = tags[recipeId] || [];
+            if (list.includes(tag)) {
+                tags[recipeId] = list.filter(t => t !== tag);
+                if (tags[recipeId].length === 0) delete tags[recipeId];
+            } else {
+                tags[recipeId] = [...list, tag];
+            }
+            saveSceneTags(tags);
+            renderSceneTagsForRecipe(recipeId);
+            renderRecipes();
+            populateTagFilter();
+        });
+    });
+}
+
+function populateTagFilter() {
+    const tags = getSceneTags();
+    const usedTags = new Set();
+    Object.values(tags).forEach(arr => arr.forEach(t => usedTags.add(t)));
+
+    tagFilterWrap.innerHTML = '<span class="tag-filter-label">シーン:</span>';
+    if (usedTags.size === 0) {
+        tagFilterWrap.style.display = 'none';
+        return;
+    }
+    tagFilterWrap.style.display = '';
+    [...usedTags].sort((a, b) => a.localeCompare(b, 'ja')).forEach(tag => {
+        const btn = document.createElement('button');
+        btn.className = 'tag-filter-btn' + (activeTagFilter === tag ? ' active' : '');
+        btn.textContent = tag;
+        btn.addEventListener('click', () => {
+            activeTagFilter = activeTagFilter === tag ? '' : tag;
+            populateTagFilter();
+            renderRecipes();
+        });
+        tagFilterWrap.appendChild(btn);
+    });
+}
+
+// ===== Similar Recipes =====
+function findSimilarRecipes(recipe, maxCount = 5) {
+    const combined = getCombinedRecipes();
+    const sim = (recipe.settings.film_simulation || '').toLowerCase();
+
+    const scored = combined
+        .filter(r => r.id !== recipe.id)
+        .map(r => {
+            let score = 0;
+            const rSim = (r.settings.film_simulation || '').toLowerCase();
+            if (rSim && rSim === sim) score += 3;
+            const rDR = (r.settings.dynamic_range || '').toLowerCase();
+            const dr = (recipe.settings.dynamic_range || '').toLowerCase();
+            if (rDR && rDR === dr) score += 1;
+            const rWBBase = extractWBBase(r.settings.white_balance || '').toLowerCase();
+            const wbBase = extractWBBase(recipe.settings.white_balance || '').toLowerCase();
+            if (rWBBase && rWBBase === wbBase) score += 1;
+            return { recipe: r, score };
+        })
+        .filter(s => s.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, maxCount);
+
+    return scored.map(s => s.recipe);
+}
+
+function renderSimilarRecipes(recipe) {
+    const similar = findSimilarRecipes(recipe);
+    if (similar.length === 0) {
+        document.getElementById('similarRecipes').style.display = 'none';
+        return;
+    }
+    document.getElementById('similarRecipes').style.display = '';
+    similarRecipesList.innerHTML = similar.map(r => `
+        <div class="similar-recipe-item" data-id="${r.id}" data-myrecipe="${r.isMyRecipe || false}">
+            <div class="similar-recipe-info">
+                <span class="similar-recipe-name">${r.title}</span>
+                <span class="similar-recipe-sim">${r.settings.film_simulation || ''} / ${r.isMyRecipe ? 'MY' : r.generation}</span>
+            </div>
+            <svg class="similar-recipe-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </div>
+    `).join('');
+
+    similarRecipesList.querySelectorAll('.similar-recipe-item').forEach(el => {
+        el.addEventListener('click', () => {
+            const id = el.dataset.id;
+            const isMyRecipe = el.dataset.myrecipe === 'true';
+            let target;
+            if (isMyRecipe) {
+                target = myRecipes.find(r => r.id === id);
+                if (target) target = { ...target, generation: 'myrecipe', isMyRecipe: true };
+            } else {
+                target = allRecipes.find(r => r.id === id);
+            }
+            if (target) openModal(target);
+        });
+    });
+}
+
 // ===== Recipe Memo & Rating =====
 function getMemos() {
     try {
@@ -11096,6 +11488,7 @@ function setupEventListeners() {
     memoSaveBtn.addEventListener('click', saveMemoForRecipe);
     randomRecipeBtn.addEventListener('click', openRandomRecipe);
     darkModeToggle.addEventListener('click', toggleDarkMode);
+    sortSelect.addEventListener('change', renderRecipes);
 
     createRecipeBtn.addEventListener('click', () => openCreateModal());
     createModalClose.addEventListener('click', closeCreateModal);
