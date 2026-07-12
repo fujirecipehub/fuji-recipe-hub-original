@@ -12247,7 +12247,7 @@ async function drawShareCard({ title, camera, shotDate, notes, kv, mainImgSrc })
         }).catch(() => null);
     }
 
-    const W = 1080;
+    const W = 760;
     const pad = 56;
     const gold = '#8b6914';
     const bgColor = '#faf8f4';
@@ -12261,8 +12261,8 @@ async function drawShareCard({ title, camera, shotDate, notes, kv, mainImgSrc })
         const targetW = W - pad * 2;
         photoH = Math.min(720, Math.round(targetW * (img.height / img.width)));
     }
-    const rowH = 62;
-    const rows = Math.ceil(kv.length / 2);
+    const rowH = 58;
+    const rows = kv.length;
     const settingsH = 60 + rows * rowH + 30;
     let notesLines = [];
     const notesFontSize = 24;
@@ -12279,7 +12279,9 @@ async function drawShareCard({ title, camera, shotDate, notes, kv, mainImgSrc })
     }
     const notesH = notesLines.length ? 60 + notesLines.length * 34 + 20 : 0;
     const footerH = 90;
-    const H = headerH + photoH + settingsH + notesH + footerH + pad * 2;
+    const rawH = headerH + photoH + settingsH + notesH + footerH + pad * 2;
+    // Guarantee a portrait card even when content is short
+    const H = Math.max(rawH, Math.round(W * 1.2));
 
     const canvas = document.createElement('canvas');
     canvas.width = W;
@@ -12354,23 +12356,32 @@ async function drawShareCard({ title, camera, shotDate, notes, kv, mainImgSrc })
     ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke();
     y += 18;
 
-    const colW = (W - pad * 2) / 2;
+    ctx.textBaseline = 'middle';
     for (let i = 0; i < kv.length; i++) {
-        const col = i % 2;
-        const row = Math.floor(i / 2);
-        const cx = pad + col * colW;
-        const cy = y + row * rowH;
+        const cy = y + i * rowH + rowH / 2;
+        // label (left)
+        ctx.textAlign = 'left';
         ctx.fillStyle = subColor;
-        ctx.font = '500 16px system-ui, -apple-system, sans-serif';
-        ctx.fillText(kv[i][0].toUpperCase(), cx, cy);
+        ctx.font = '600 17px system-ui, -apple-system, sans-serif';
+        ctx.fillText(kv[i][0].toUpperCase(), pad, cy);
+        // value (right)
+        ctx.textAlign = 'right';
         ctx.fillStyle = textColor;
-        ctx.font = '600 22px system-ui, -apple-system, sans-serif';
+        ctx.font = '600 23px system-ui, -apple-system, sans-serif';
         let val = kv[i][1].toString();
-        const maxW = colW - 20;
+        const maxW = W - pad * 2 - 250;
         while (ctx.measureText(val).width > maxW && val.length > 3) val = val.slice(0, -1);
         if (val !== kv[i][1].toString()) val = val.slice(0, -1) + '…';
-        ctx.fillText(val, cx, cy + 24);
+        ctx.fillText(val, W - pad, cy);
+        // row separator
+        if (i < kv.length - 1) {
+            ctx.strokeStyle = borderColor;
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(pad, y + (i + 1) * rowH); ctx.lineTo(W - pad, y + (i + 1) * rowH); ctx.stroke();
+        }
     }
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
     y += rows * rowH + 20;
 
     if (notesLines.length) {
