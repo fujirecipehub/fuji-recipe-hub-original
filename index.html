@@ -1500,6 +1500,264 @@ body.font-large { --font-size-base: 18px; }
     }
 }
 
+/* ===== Random Recipe Button ===== */
+.random-recipe-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, var(--accent-teal), #047857);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-jp);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.random-recipe-btn svg {
+    width: 16px;
+    height: 16px;
+}
+.random-recipe-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+.random-recipe-btn:active {
+    transform: scale(0.96);
+}
+
+/* ===== Recipe Memo & Rating ===== */
+.recipe-memo-section {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+.memo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.6rem;
+}
+.memo-header-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-family: var(--font-outfit);
+    letter-spacing: 0.05em;
+}
+.star-rating {
+    display: flex;
+    gap: 2px;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+.star-rating input {
+    display: none;
+}
+.star-rating label {
+    cursor: pointer;
+    font-size: 1.4rem;
+    color: var(--border-color);
+    transition: color 0.15s;
+    line-height: 1;
+}
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+    color: #f59e0b;
+}
+.memo-textarea {
+    width: 100%;
+    min-height: 60px;
+    padding: 0.6rem 0.75rem;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-family: var(--font-jp);
+    resize: vertical;
+    outline: none;
+    transition: var(--transition-smooth);
+}
+.memo-textarea:focus {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 6px rgba(139, 105, 20, 0.1);
+}
+.memo-textarea::placeholder {
+    color: var(--text-muted);
+}
+.memo-save-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+    padding: 0.4rem 0.9rem;
+    background: var(--accent-teal);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-family: var(--font-jp);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.memo-save-btn:hover {
+    background: #047857;
+}
+.memo-display {
+    margin-top: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.memo-display-stars {
+    color: #f59e0b;
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+}
+
+/* ===== Dark Mode Toggle ===== */
+.dark-mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--border-color);
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: var(--font-jp);
+    color: var(--text-secondary);
+    transition: var(--transition-smooth);
+    white-space: nowrap;
+}
+.dark-mode-toggle:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+.dark-mode-toggle svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ===== Dark Theme ===== */
+body.dark-theme {
+    --bg-main: #0b0b0d;
+    --bg-gradient: linear-gradient(135deg, #0b0b0d 0%, #1a1a2e 100%);
+    --bg-surface: rgba(30, 30, 40, 0.85);
+    --bg-surface-hover: rgba(40, 40, 55, 0.9);
+    --bg-modal: rgba(20, 20, 28, 0.97);
+
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-color-hover: rgba(255, 255, 255, 0.15);
+
+    --text-primary: #e8e8ed;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 4px 10px -5px rgba(0, 0, 0, 0.3);
+    --shadow-glow: 0 0 12px rgba(212, 83, 29, 0.2);
+}
+
+body.dark-theme ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+}
+body.dark-theme ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+}
+body.dark-theme ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+body.dark-theme .search-wrapper input {
+    background: rgba(255, 255, 255, 0.05);
+}
+body.dark-theme .search-wrapper input:focus {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+body.dark-theme .tabs {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+body.dark-theme .fontsize-controls {
+    background: rgba(255, 255, 255, 0.04);
+}
+body.dark-theme .fontsize-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-theme .filter-dropdown select {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-theme .recipe-card {
+    background: rgba(30, 30, 40, 0.7);
+}
+body.dark-theme .recipe-card:hover {
+    background: rgba(40, 40, 55, 0.8);
+}
+
+body.dark-theme .card-img-placeholder {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+body.dark-theme .camera-menu-list {
+    background: #0a0a0c;
+}
+body.dark-theme .menu-row {
+    border-color: rgba(255, 255, 255, 0.06);
+}
+body.dark-theme .camera-screen-header,
+body.dark-theme .camera-screen-footer {
+    background: #111118;
+}
+
+body.dark-theme .memo-textarea {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .dark-mode-toggle {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-theme .backup-btn {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-theme .fav-toggle-btn {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+body.dark-theme .create-modal-content,
+body.dark-theme .modal-container {
+    background: var(--bg-modal);
+}
+
+body.dark-theme .form-input,
+body.dark-theme .form-select {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+body.dark-theme .exif-notice {
+    background: rgba(5, 150, 105, 0.1);
+    border-color: rgba(5, 150, 105, 0.3);
+    color: #6ee7b7;
+}
+
 </style>
 </head>
 <body>
@@ -1594,6 +1852,20 @@ body.font-large { --font-size-base: 18px; }
                     <span id="favCount" class="counter">0</span>
                 </button>
 
+                <button id="randomRecipeBtn" class="random-recipe-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>今日のレシピ</span>
+                </button>
+
+                <button id="darkModeToggle" class="dark-mode-toggle">
+                    <svg id="darkModeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                    <span id="darkModeLabel">ダーク</span>
+                </button>
+
                 <div class="fontsize-controls">
                     <button class="fontsize-btn" data-size="small" onclick="setFontSize('small')">小</button>
                     <button class="fontsize-btn active" data-size="medium" onclick="setFontSize('medium')">中</button>
@@ -1664,6 +1936,21 @@ body.font-large { --font-size-base: 18px; }
                             <span>BACK</span>
                             <span class="footer-dot">•</span>
                             <span>SELECT</span>
+                        </div>
+
+                        <div class="recipe-memo-section" id="memoSection">
+                            <div class="memo-header">
+                                <span class="memo-header-title">MY NOTE</span>
+                                <div class="star-rating" id="starRating">
+                                    <input type="radio" name="rating" id="star5" value="5"><label for="star5">&#9733;</label>
+                                    <input type="radio" name="rating" id="star4" value="4"><label for="star4">&#9733;</label>
+                                    <input type="radio" name="rating" id="star3" value="3"><label for="star3">&#9733;</label>
+                                    <input type="radio" name="rating" id="star2" value="2"><label for="star2">&#9733;</label>
+                                    <input type="radio" name="rating" id="star1" value="1"><label for="star1">&#9733;</label>
+                                </div>
+                            </div>
+                            <textarea class="memo-textarea" id="memoTextarea" placeholder="撮影メモ（例: 晴天の屋外で最高、夕方のゴールデンアワーに合う）"></textarea>
+                            <button class="memo-save-btn" id="memoSaveBtn">保存</button>
                         </div>
                     </div>
                 </div>
@@ -9082,6 +9369,12 @@ const filterFilmSim = document.getElementById('filterFilmSim');
 const filterWB = document.getElementById('filterWB');
 const filterDR = document.getElementById('filterDR');
 const filterResetBtn = document.getElementById('filterResetBtn');
+const randomRecipeBtn = document.getElementById('randomRecipeBtn');
+const darkModeToggle = document.getElementById('darkModeToggle');
+const memoTextarea = document.getElementById('memoTextarea');
+const memoSaveBtn = document.getElementById('memoSaveBtn');
+const starRating = document.getElementById('starRating');
+let currentModalRecipeId = null;
 
 // Modal Elements
 const recipeModal = document.getElementById('recipeModal');
@@ -9337,6 +9630,7 @@ async function compressImage(dataUrl, maxWidth = 800) {
 
 // ===== Initialize Application =====
 async function init() {
+    initDarkMode();
     loadFavorites();
     updateFavCounter();
     await openDB();
@@ -9492,10 +9786,13 @@ function renderRecipes() {
 
     resultCountEl.textContent = `${filteredRecipes.length} 件のレシピが見つかりました`;
 
+    const memos = getMemos();
+
     recipeGrid.innerHTML = filteredRecipes.map(recipe => {
         const isFav = favorites.has(recipe.id);
         const isMyRecipe = recipe.isMyRecipe;
         const userPhotos = recipePhotos[recipe.id];
+        const memoData = memos[recipe.id];
 
         let imageHtml;
         if (isMyRecipe && recipe.images && recipe.images.length > 0) {
@@ -9547,6 +9844,7 @@ function renderRecipes() {
                     </div>
                     <div class="card-bottom">
                         <span class="card-sim">${baseSim}</span>
+                        ${memoData && memoData.rating ? '<span style="color:#f59e0b;font-size:0.85rem;">' + '&#9733;'.repeat(memoData.rating) + '</span>' : ''}
                         <svg class="card-arrow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
@@ -9762,6 +10060,9 @@ function openModal(recipe) {
         }
     });
 
+    currentModalRecipeId = recipe.id;
+    loadMemoForRecipe(recipe.id);
+
     recipeModal.classList.add('open');
     document.body.style.overflow = 'hidden';
 }
@@ -9770,6 +10071,7 @@ function openModal(recipe) {
 function closeModal() {
     recipeModal.classList.remove('open');
     document.body.style.overflow = '';
+    currentModalRecipeId = null;
 }
 
 // ===== Create/Edit Modal =====
@@ -10669,6 +10971,78 @@ function updateFavCounter() {
     favCountEl.textContent = favorites.size;
 }
 
+// ===== Recipe Memo & Rating =====
+function getMemos() {
+    try {
+        return JSON.parse(localStorage.getItem('fuji_recipe_memos_original') || '{}');
+    } catch { return {}; }
+}
+
+function saveMemos(memos) {
+    localStorage.setItem('fuji_recipe_memos_original', JSON.stringify(memos));
+}
+
+function loadMemoForRecipe(recipeId) {
+    const memos = getMemos();
+    const data = memos[recipeId] || {};
+    memoTextarea.value = data.memo || '';
+    document.querySelectorAll('#starRating input').forEach(inp => { inp.checked = false; });
+    if (data.rating) {
+        const el = document.getElementById('star' + data.rating);
+        if (el) el.checked = true;
+    }
+}
+
+function saveMemoForRecipe() {
+    if (!currentModalRecipeId) return;
+    const memos = getMemos();
+    const rating = document.querySelector('#starRating input:checked');
+    memos[currentModalRecipeId] = {
+        memo: memoTextarea.value.trim(),
+        rating: rating ? parseInt(rating.value) : 0
+    };
+    if (!memos[currentModalRecipeId].memo && !memos[currentModalRecipeId].rating) {
+        delete memos[currentModalRecipeId];
+    }
+    saveMemos(memos);
+    renderRecipes();
+}
+
+// ===== Random Recipe =====
+function openRandomRecipe() {
+    const combined = getCombinedRecipes();
+    if (combined.length === 0) return;
+    const recipe = combined[Math.floor(Math.random() * combined.length)];
+    openModal(recipe);
+}
+
+// ===== Dark Mode =====
+function initDarkMode() {
+    const saved = localStorage.getItem('fuji_dark_mode_original');
+    if (saved === 'true') {
+        document.body.classList.add('dark-theme');
+        updateDarkModeUI(true);
+    }
+}
+
+function toggleDarkMode() {
+    const isDark = document.body.classList.toggle('dark-theme');
+    localStorage.setItem('fuji_dark_mode_original', isDark);
+    updateDarkModeUI(isDark);
+}
+
+function updateDarkModeUI(isDark) {
+    const icon = document.getElementById('darkModeIcon');
+    const label = document.getElementById('darkModeLabel');
+    if (isDark) {
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />';
+        label.textContent = 'ライト';
+    } else {
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />';
+        label.textContent = 'ダーク';
+    }
+}
+
 // Event Listeners setup
 function setupEventListeners() {
     searchInput.addEventListener('input', () => {
@@ -10718,6 +11092,10 @@ function setupEventListeners() {
     recipeModal.addEventListener('click', (e) => {
         if (e.target === recipeModal) closeModal();
     });
+
+    memoSaveBtn.addEventListener('click', saveMemoForRecipe);
+    randomRecipeBtn.addEventListener('click', openRandomRecipe);
+    darkModeToggle.addEventListener('click', toggleDarkMode);
 
     createRecipeBtn.addEventListener('click', () => openCreateModal());
     createModalClose.addEventListener('click', closeCreateModal);
