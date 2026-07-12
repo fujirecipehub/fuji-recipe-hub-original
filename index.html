@@ -1970,6 +1970,460 @@ body.dark-theme .tag-filter-btn {
     background: rgba(255, 255, 255, 0.04);
 }
 
+/* ===== Stats Dashboard Modal ===== */
+.dash-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.dash-overlay.open { display: flex; }
+.dash-container {
+    background: var(--bg-modal);
+    border-radius: 16px;
+    max-width: 640px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 1.5rem;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+}
+.dash-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0.25rem;
+}
+.dash-close svg { width: 20px; height: 20px; }
+.dash-title {
+    font-family: var(--font-outfit);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    color: var(--text-primary);
+}
+.dash-section {
+    margin-bottom: 1.5rem;
+}
+.dash-section-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-family: var(--font-outfit);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.6rem;
+}
+.dash-bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+.dash-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.dash-bar-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    width: 120px;
+    flex-shrink: 0;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.dash-bar-track {
+    flex: 1;
+    height: 18px;
+    background: rgba(0,0,0,0.04);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+body.dark-theme .dash-bar-track { background: rgba(255,255,255,0.06); }
+.dash-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent-orange), #e8723a);
+    transition: width 0.5s ease;
+    min-width: 2px;
+}
+.dash-bar-count {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    width: 30px;
+    flex-shrink: 0;
+}
+.dash-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+}
+.dash-stat-card {
+    background: rgba(0,0,0,0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.75rem;
+    text-align: center;
+}
+body.dark-theme .dash-stat-card { background: rgba(255,255,255,0.04); }
+.dash-stat-value {
+    font-family: var(--font-outfit);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-orange);
+}
+.dash-stat-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+}
+.dash-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background: rgba(0,0,0,0.04);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: var(--font-jp);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    white-space: nowrap;
+}
+.dash-btn:hover { background: rgba(0,0,0,0.08); }
+.dash-btn svg { width: 16px; height: 16px; }
+body.dark-theme .dash-btn { background: rgba(255,255,255,0.06); }
+
+/* ===== Compare Modal ===== */
+.compare-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.compare-overlay.open { display: flex; }
+.compare-container {
+    background: var(--bg-modal);
+    border-radius: 16px;
+    max-width: 720px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 1.5rem;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+}
+.compare-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0.25rem;
+}
+.compare-close svg { width: 20px; height: 20px; }
+.compare-title {
+    font-family: var(--font-outfit);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+.compare-selectors {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+.compare-select-wrap {
+    flex: 1;
+    min-width: 150px;
+}
+.compare-select-wrap label {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+}
+.compare-select-wrap select {
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.82rem;
+    font-family: var(--font-jp);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: rgba(0,0,0,0.03);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+body.dark-theme .compare-select-wrap select {
+    background: rgba(255,255,255,0.05);
+    color: var(--text-primary);
+}
+.compare-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.compare-table th {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 0.5rem 0.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+.compare-table td {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+.compare-table tr.diff td {
+    background: rgba(212, 83, 29, 0.06);
+}
+body.dark-theme .compare-table tr.diff td {
+    background: rgba(212, 83, 29, 0.12);
+}
+.compare-table td.setting-label {
+    font-weight: 500;
+    color: var(--text-secondary);
+    width: 30%;
+}
+
+/* ===== Collections ===== */
+.collections-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background: rgba(0,0,0,0.04);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: var(--font-jp);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    white-space: nowrap;
+}
+.collections-btn:hover { background: rgba(0,0,0,0.08); }
+.collections-btn svg { width: 16px; height: 16px; }
+.collections-btn.active {
+    background: rgba(139, 105, 20, 0.1);
+    border-color: rgba(139, 105, 20, 0.3);
+    color: var(--accent-gold);
+}
+body.dark-theme .collections-btn { background: rgba(255,255,255,0.06); }
+
+.coll-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.coll-overlay.open { display: flex; }
+.coll-container {
+    background: var(--bg-modal);
+    border-radius: 16px;
+    max-width: 480px;
+    width: 100%;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 1.5rem;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+}
+.coll-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0.25rem;
+}
+.coll-close svg { width: 20px; height: 20px; }
+.coll-title {
+    font-family: var(--font-outfit);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+.coll-add-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.coll-add-input {
+    flex: 1;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.85rem;
+    font-family: var(--font-jp);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: rgba(0,0,0,0.03);
+    color: var(--text-primary);
+    outline: none;
+}
+body.dark-theme .coll-add-input { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+.coll-add-input:focus { border-color: var(--accent-gold); }
+.coll-add-btn {
+    padding: 0.5rem 0.8rem;
+    background: var(--accent-gold);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-family: var(--font-jp);
+    font-weight: 600;
+    cursor: pointer;
+}
+.coll-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+.coll-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.75rem;
+    background: rgba(0,0,0,0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+body.dark-theme .coll-item { background: rgba(255,255,255,0.04); }
+.coll-item:hover { border-color: var(--border-color-hover); }
+.coll-item-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.coll-item-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+.coll-item-count {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    background: rgba(0,0,0,0.06);
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+}
+body.dark-theme .coll-item-count { background: rgba(255,255,255,0.08); }
+.coll-item-del {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.2rem;
+    font-size: 1rem;
+    line-height: 1;
+    transition: color 0.15s;
+}
+.coll-item-del:hover { color: var(--danger-red); }
+.coll-recipe-assign {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(0,0,0,0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+body.dark-theme .coll-recipe-assign { background: rgba(255,255,255,0.03); }
+.coll-assign-title {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+}
+.coll-assign-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+.coll-assign-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.25rem 0.55rem;
+    font-size: 0.72rem;
+    font-family: var(--font-jp);
+    border-radius: 20px;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background: rgba(0,0,0,0.03);
+    color: var(--text-secondary);
+    transition: all 0.15s;
+}
+.coll-assign-tag:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+.coll-assign-tag.active {
+    background: var(--accent-gold);
+    border-color: var(--accent-gold);
+    color: white;
+}
+body.dark-theme .coll-assign-tag { background: rgba(255,255,255,0.04); }
+.coll-filter-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    align-items: center;
+    margin-top: 0.4rem;
+}
+.coll-filter-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-right: 0.2rem;
+    white-space: nowrap;
+}
+.coll-filter-btn {
+    display: inline-flex;
+    padding: 0.25rem 0.55rem;
+    font-size: 0.72rem;
+    font-family: var(--font-jp);
+    border-radius: 20px;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background: rgba(0,0,0,0.03);
+    color: var(--text-secondary);
+    transition: all 0.15s;
+}
+.coll-filter-btn:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+.coll-filter-btn.active {
+    background: var(--accent-gold);
+    border-color: var(--accent-gold);
+    color: white;
+}
+body.dark-theme .coll-filter-btn { background: rgba(255,255,255,0.04); }
+
 </style>
 </head>
 <body>
@@ -2078,6 +2532,27 @@ body.dark-theme .tag-filter-btn {
                     <span id="darkModeLabel">ダーク</span>
                 </button>
 
+                <button id="dashBtn" class="dash-btn" title="統計">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <span>統計</span>
+                </button>
+
+                <button id="compareBtn" class="dash-btn" title="比較">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                    <span>比較</span>
+                </button>
+
+                <button id="collBtn" class="collections-btn" title="コレクション">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                    <span>コレクション</span>
+                </button>
+
                 <div class="fontsize-controls">
                     <button class="fontsize-btn" data-size="small" onclick="setFontSize('small')">小</button>
                     <button class="fontsize-btn active" data-size="medium" onclick="setFontSize('medium')">中</button>
@@ -2106,6 +2581,9 @@ body.dark-theme .tag-filter-btn {
         </div>
         <div class="tag-filter-wrap" id="tagFilterWrap">
             <span class="tag-filter-label">シーン:</span>
+        </div>
+        <div class="coll-filter-wrap" id="collFilterWrap" style="display:none;">
+            <span class="coll-filter-label">コレクション:</span>
         </div>
 
         <!-- Recipe Grid -->
@@ -2181,6 +2659,10 @@ body.dark-theme .tag-filter-btn {
                             <div class="scene-tags-section">
                                 <div class="scene-tags-label">シーンタグ</div>
                                 <div class="scene-tags-wrap" id="sceneTagsWrap"></div>
+                            </div>
+                            <div class="coll-recipe-assign" id="collRecipeAssign">
+                                <div class="coll-assign-title">コレクションに追加</div>
+                                <div class="coll-assign-list" id="collAssignList"></div>
                             </div>
                             <textarea class="memo-textarea" id="memoTextarea" placeholder="撮影メモ（例: 晴天の屋外で最高、夕方のゴールデンアワーに合う）"></textarea>
                             <button class="memo-save-btn" id="memoSaveBtn">保存</button>
@@ -2350,6 +2832,53 @@ body.dark-theme .tag-filter-btn {
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Modal -->
+    <div class="dash-overlay" id="dashOverlay">
+        <div class="dash-container">
+            <button class="dash-close" id="dashClose">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="dash-title">レシピ統計</div>
+            <div id="dashContent"></div>
+        </div>
+    </div>
+
+    <!-- Compare Modal -->
+    <div class="compare-overlay" id="compareOverlay">
+        <div class="compare-container">
+            <button class="compare-close" id="compareClose">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="compare-title">レシピ比較</div>
+            <div class="compare-selectors">
+                <div class="compare-select-wrap">
+                    <label>レシピ A</label>
+                    <select id="compareA"></select>
+                </div>
+                <div class="compare-select-wrap">
+                    <label>レシピ B</label>
+                    <select id="compareB"></select>
+                </div>
+            </div>
+            <div id="compareResult"></div>
+        </div>
+    </div>
+
+    <!-- Collections Modal -->
+    <div class="coll-overlay" id="collOverlay">
+        <div class="coll-container">
+            <button class="coll-close" id="collClose">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="coll-title">コレクション</div>
+            <div class="coll-add-row">
+                <input type="text" class="coll-add-input" id="collAddInput" placeholder="新しいコレクション名...">
+                <button class="coll-add-btn" id="collAddBtn">追加</button>
+            </div>
+            <div class="coll-list" id="collList"></div>
         </div>
     </div>
 
@@ -9616,8 +10145,20 @@ const sortSelect = document.getElementById('sortSelect');
 const sceneTagsWrap = document.getElementById('sceneTagsWrap');
 const similarRecipesList = document.getElementById('similarRecipesList');
 const tagFilterWrap = document.getElementById('tagFilterWrap');
+const dashOverlay = document.getElementById('dashOverlay');
+const dashContent = document.getElementById('dashContent');
+const compareOverlay = document.getElementById('compareOverlay');
+const compareA = document.getElementById('compareA');
+const compareB = document.getElementById('compareB');
+const compareResult = document.getElementById('compareResult');
+const collOverlay = document.getElementById('collOverlay');
+const collList = document.getElementById('collList');
+const collAddInput = document.getElementById('collAddInput');
+const collFilterWrap = document.getElementById('collFilterWrap');
+const collAssignList = document.getElementById('collAssignList');
 let currentModalRecipeId = null;
 let activeTagFilter = '';
+let activeCollFilter = '';
 
 const SCENE_TAGS = ['ポートレート', '風景', 'スナップ', '夜景', 'ストリート', '旅行', '食べ物', 'モノクロ', '日常', 'フィルムライク'];
 
@@ -9904,6 +10445,7 @@ async function fetchRecipes() {
         }));
         populateFilters();
         populateTagFilter();
+        populateCollFilter();
         renderRecipes();
     } catch (error) {
         console.error('Error loading recipes:', error);
@@ -10018,6 +10560,12 @@ function renderRecipes() {
             const sceneTags = getSceneTags();
             const recipeTags = sceneTags[recipe.id] || [];
             if (!recipeTags.includes(activeTagFilter)) return false;
+        }
+
+        if (activeCollFilter) {
+            const colls = getCollections();
+            const coll = colls.find(c => c.name === activeCollFilter);
+            if (!coll || !coll.recipes.includes(recipe.id)) return false;
         }
 
         return true;
@@ -10331,6 +10879,7 @@ function openModal(recipe) {
     currentModalRecipeId = recipe.id;
     loadMemoForRecipe(recipe.id);
     renderSceneTagsForRecipe(recipe.id);
+    renderCollAssign(recipe.id);
     renderSimilarRecipes(recipe);
 
     recipeModal.classList.add('open');
@@ -11435,6 +11984,261 @@ function updateDarkModeUI(isDark) {
     }
 }
 
+// ===== Statistics Dashboard =====
+function openDashboard() {
+    const combined = getCombinedRecipes();
+    const memos = getMemos();
+    const sceneTags = getSceneTags();
+    const collections = getCollections();
+
+    const simCounts = {};
+    combined.forEach(r => {
+        const sim = (r.settings.film_simulation || 'Unknown').replace(/&nbsp;/g, ' ').trim();
+        simCounts[sim] = (simCounts[sim] || 0) + 1;
+    });
+
+    const ratingDist = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    let ratedCount = 0;
+    let totalRating = 0;
+    Object.values(memos).forEach(m => {
+        const r = m.rating || 0;
+        ratingDist[r]++;
+        if (r > 0) { ratedCount++; totalRating += r; }
+    });
+    const avgRating = ratedCount > 0 ? (totalRating / ratedCount).toFixed(1) : '-';
+
+    const tagCounts = {};
+    Object.values(sceneTags).forEach(arr => arr.forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; }));
+
+    const maxSim = Math.max(...Object.values(simCounts), 1);
+    const simSorted = Object.entries(simCounts).sort((a, b) => b[1] - a[1]).slice(0, 12);
+
+    let html = `
+        <div class="dash-section">
+            <div class="dash-summary">
+                <div class="dash-stat-card"><div class="dash-stat-value">${combined.length}</div><div class="dash-stat-label">総レシピ数</div></div>
+                <div class="dash-stat-card"><div class="dash-stat-value">${favorites.size}</div><div class="dash-stat-label">お気に入り</div></div>
+                <div class="dash-stat-card"><div class="dash-stat-value">${ratedCount}</div><div class="dash-stat-label">評価済み</div></div>
+                <div class="dash-stat-card"><div class="dash-stat-value">${avgRating}</div><div class="dash-stat-label">平均★</div></div>
+                <div class="dash-stat-card"><div class="dash-stat-value">${Object.keys(sceneTags).length}</div><div class="dash-stat-label">タグ付き</div></div>
+                <div class="dash-stat-card"><div class="dash-stat-value">${collections.length}</div><div class="dash-stat-label">コレクション</div></div>
+            </div>
+        </div>
+        <div class="dash-section">
+            <div class="dash-section-title">FILM SIMULATION 使用分布</div>
+            <div class="dash-bar-chart">
+                ${simSorted.map(([name, count]) => `
+                    <div class="dash-bar-row">
+                        <span class="dash-bar-label">${name}</span>
+                        <div class="dash-bar-track"><div class="dash-bar-fill" style="width:${(count / maxSim * 100).toFixed(1)}%"></div></div>
+                        <span class="dash-bar-count">${count}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>`;
+
+    if (Object.keys(tagCounts).length > 0) {
+        const maxTag = Math.max(...Object.values(tagCounts), 1);
+        html += `<div class="dash-section">
+            <div class="dash-section-title">SCENE TAG 分布</div>
+            <div class="dash-bar-chart">
+                ${Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).map(([name, count]) => `
+                    <div class="dash-bar-row">
+                        <span class="dash-bar-label">${name}</span>
+                        <div class="dash-bar-track"><div class="dash-bar-fill" style="width:${(count / maxTag * 100).toFixed(1)}%;background:linear-gradient(90deg,var(--accent-teal),#34d399)"></div></div>
+                        <span class="dash-bar-count">${count}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>`;
+    }
+
+    if (ratedCount > 0) {
+        const maxR = Math.max(...Object.entries(ratingDist).filter(([k]) => k > 0).map(([, v]) => v), 1);
+        html += `<div class="dash-section">
+            <div class="dash-section-title">★ 評価分布</div>
+            <div class="dash-bar-chart">
+                ${[5, 4, 3, 2, 1].map(star => `
+                    <div class="dash-bar-row">
+                        <span class="dash-bar-label" style="color:#f59e0b">${'★'.repeat(star)}</span>
+                        <div class="dash-bar-track"><div class="dash-bar-fill" style="width:${(ratingDist[star] / maxR * 100).toFixed(1)}%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div>
+                        <span class="dash-bar-count">${ratingDist[star]}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>`;
+    }
+
+    dashContent.innerHTML = html;
+    dashOverlay.classList.add('open');
+}
+
+// ===== Recipe Compare =====
+const settingLabelsCompare = {
+    film_simulation: 'フィルムシミュレーション', dynamic_range: 'ダイナミックレンジ',
+    grain_effect: 'グレインエフェクト', grain_size: 'グレインサイズ',
+    color_chrome_effect: 'カラークロームエフェクト', color_chrome_fx_blue: 'カラークロームブルー',
+    white_balance: 'ホワイトバランス', highlight_tone: 'ハイライトトーン', shadow_tone: 'シャドウトーン',
+    color: 'カラー', sharpness: 'シャープネス', noise_reduction: 'ノイズリダクション',
+    clarity: 'クラリティ', exposure_compensation: '露出補正'
+};
+
+function openCompare() {
+    const combined = getCombinedRecipes();
+    const opts = combined.map(r => `<option value="${r.id}">${r.title}</option>`).join('');
+    compareA.innerHTML = '<option value="">選択...</option>' + opts;
+    compareB.innerHTML = '<option value="">選択...</option>' + opts;
+    compareResult.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">2つのレシピを選択してください</p>';
+    compareOverlay.classList.add('open');
+}
+
+function runCompare() {
+    const combined = getCombinedRecipes();
+    const a = combined.find(r => r.id === compareA.value);
+    const b = combined.find(r => r.id === compareB.value);
+    if (!a || !b) {
+        compareResult.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">2つのレシピを選択してください</p>';
+        return;
+    }
+
+    const allKeys = ['film_simulation', 'dynamic_range', 'grain_effect', 'grain_size', 'color_chrome_effect',
+        'color_chrome_fx_blue', 'white_balance', 'highlight_tone', 'shadow_tone', 'color', 'sharpness',
+        'noise_reduction', 'clarity', 'exposure_compensation'];
+
+    let rows = '';
+    allKeys.forEach(key => {
+        const va = (a.settings[key] || '-').replace(/&nbsp;/g, ' ');
+        const vb = (b.settings[key] || '-').replace(/&nbsp;/g, ' ');
+        const isDiff = va !== vb;
+        rows += `<tr class="${isDiff ? 'diff' : ''}">
+            <td class="setting-label">${settingLabelsCompare[key] || key}</td>
+            <td>${va}</td>
+            <td>${vb}</td>
+        </tr>`;
+    });
+
+    compareResult.innerHTML = `<table class="compare-table">
+        <thead><tr><th>設定</th><th>${a.title}</th><th>${b.title}</th></tr></thead>
+        <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ===== Collections =====
+function getCollections() {
+    try { return JSON.parse(localStorage.getItem('fuji_collections_original') || '[]'); }
+    catch { return []; }
+}
+
+function saveCollections(colls) {
+    localStorage.setItem('fuji_collections_original', JSON.stringify(colls));
+}
+
+function addCollection(name) {
+    if (!name.trim()) return;
+    const colls = getCollections();
+    if (colls.some(c => c.name === name.trim())) return;
+    colls.push({ name: name.trim(), recipes: [] });
+    saveCollections(colls);
+    renderCollections();
+    populateCollFilter();
+}
+
+function deleteCollection(name) {
+    if (!confirm(`「${name}」を削除しますか？`)) return;
+    const colls = getCollections().filter(c => c.name !== name);
+    saveCollections(colls);
+    if (activeCollFilter === name) activeCollFilter = '';
+    renderCollections();
+    populateCollFilter();
+    renderRecipes();
+}
+
+function toggleRecipeInCollection(collName, recipeId) {
+    const colls = getCollections();
+    const coll = colls.find(c => c.name === collName);
+    if (!coll) return;
+    if (coll.recipes.includes(recipeId)) {
+        coll.recipes = coll.recipes.filter(id => id !== recipeId);
+    } else {
+        coll.recipes.push(recipeId);
+    }
+    saveCollections(colls);
+    renderCollAssign(recipeId);
+    populateCollFilter();
+}
+
+function renderCollections() {
+    const colls = getCollections();
+    if (colls.length === 0) {
+        collList.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">コレクションがまだありません</p>';
+        return;
+    }
+    collList.innerHTML = colls.map(c => `
+        <div class="coll-item" data-name="${c.name.replace(/"/g, '&quot;')}">
+            <div class="coll-item-info">
+                <span class="coll-item-name">${c.name}</span>
+                <span class="coll-item-count">${c.recipes.length} 件</span>
+            </div>
+            <button class="coll-item-del" data-name="${c.name.replace(/"/g, '&quot;')}" title="削除">&times;</button>
+        </div>
+    `).join('');
+
+    collList.querySelectorAll('.coll-item-del').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteCollection(btn.dataset.name);
+        });
+    });
+
+    collList.querySelectorAll('.coll-item').forEach(el => {
+        el.addEventListener('click', () => {
+            activeCollFilter = activeCollFilter === el.dataset.name ? '' : el.dataset.name;
+            collOverlay.classList.remove('open');
+            populateCollFilter();
+            renderRecipes();
+        });
+    });
+}
+
+function renderCollAssign(recipeId) {
+    const colls = getCollections();
+    if (colls.length === 0) {
+        collAssignList.innerHTML = '<span style="color:var(--text-muted);font-size:0.75rem;">コレクションを先に作成してください</span>';
+        return;
+    }
+    collAssignList.innerHTML = colls.map(c => {
+        const isIn = c.recipes.includes(recipeId);
+        return `<span class="coll-assign-tag ${isIn ? 'active' : ''}" data-coll="${c.name.replace(/"/g, '&quot;')}">${c.name}</span>`;
+    }).join('');
+
+    collAssignList.querySelectorAll('.coll-assign-tag').forEach(el => {
+        el.addEventListener('click', () => {
+            toggleRecipeInCollection(el.dataset.coll, recipeId);
+        });
+    });
+}
+
+function populateCollFilter() {
+    const colls = getCollections().filter(c => c.recipes.length > 0);
+    collFilterWrap.innerHTML = '<span class="coll-filter-label">コレクション:</span>';
+    if (colls.length === 0) {
+        collFilterWrap.style.display = 'none';
+        return;
+    }
+    collFilterWrap.style.display = '';
+    colls.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'coll-filter-btn' + (activeCollFilter === c.name ? ' active' : '');
+        btn.textContent = c.name + ' (' + c.recipes.length + ')';
+        btn.addEventListener('click', () => {
+            activeCollFilter = activeCollFilter === c.name ? '' : c.name;
+            populateCollFilter();
+            renderRecipes();
+        });
+        collFilterWrap.appendChild(btn);
+    });
+}
+
 // Event Listeners setup
 function setupEventListeners() {
     searchInput.addEventListener('input', () => {
@@ -11489,6 +12293,21 @@ function setupEventListeners() {
     randomRecipeBtn.addEventListener('click', openRandomRecipe);
     darkModeToggle.addEventListener('click', toggleDarkMode);
     sortSelect.addEventListener('change', renderRecipes);
+
+    document.getElementById('dashBtn').addEventListener('click', openDashboard);
+    document.getElementById('dashClose').addEventListener('click', () => dashOverlay.classList.remove('open'));
+    dashOverlay.addEventListener('click', (e) => { if (e.target === dashOverlay) dashOverlay.classList.remove('open'); });
+
+    document.getElementById('compareBtn').addEventListener('click', openCompare);
+    document.getElementById('compareClose').addEventListener('click', () => compareOverlay.classList.remove('open'));
+    compareOverlay.addEventListener('click', (e) => { if (e.target === compareOverlay) compareOverlay.classList.remove('open'); });
+    compareA.addEventListener('change', runCompare);
+    compareB.addEventListener('change', runCompare);
+
+    document.getElementById('collBtn').addEventListener('click', () => { renderCollections(); collOverlay.classList.add('open'); });
+    document.getElementById('collClose').addEventListener('click', () => collOverlay.classList.remove('open'));
+    collOverlay.addEventListener('click', (e) => { if (e.target === collOverlay) collOverlay.classList.remove('open'); });
+    document.getElementById('collAddBtn').addEventListener('click', () => { addCollection(collAddInput.value); collAddInput.value = ''; });
 
     createRecipeBtn.addEventListener('click', () => openCreateModal());
     createModalClose.addEventListener('click', closeCreateModal);
