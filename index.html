@@ -2310,6 +2310,61 @@ body.dark-theme .location-filter-input { background: rgba(255,255,255,0.05); }
 body.dark-theme .location-tag { background: rgba(255,255,255,0.05); }
 body.dark-theme .location-tag.active { background: var(--accent-teal); color: #fff; }
 
+/* ===== Hue Map ===== */
+.huemap-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000;
+    display: none; align-items: center; justify-content: center; padding: 1rem;
+}
+.huemap-overlay.open { display: flex; }
+.huemap-container {
+    background: var(--bg-modal); border-radius: 16px; max-width: 600px; width: 100%;
+    max-height: 90vh; overflow-y: auto; padding: 1.5rem; position: relative; box-shadow: var(--shadow-lg);
+}
+.huemap-close {
+    position: absolute; top: 1rem; right: 1rem; background: none; border: none;
+    cursor: pointer; color: var(--text-muted); padding: 0.25rem; z-index: 2;
+}
+.huemap-close svg { width: 20px; height: 20px; }
+.huemap-title {
+    font-family: var(--font-outfit); font-size: 1.1rem; font-weight: 700;
+    margin-bottom: 0.3rem; color: var(--text-primary);
+}
+.huemap-desc { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1rem; }
+.huemap-canvas-wrap {
+    position: relative; width: 100%; aspect-ratio: 1; margin: 0 auto 1rem;
+}
+.huemap-canvas-wrap canvas {
+    width: 100%; height: 100%; border-radius: 50%; cursor: crosshair;
+}
+.huemap-legend {
+    display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; margin-bottom: 0.5rem;
+}
+.huemap-legend-item {
+    display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.65rem;
+    color: var(--text-secondary); cursor: pointer; padding: 0.15rem 0.4rem;
+    border-radius: 4px; transition: var(--transition-smooth);
+}
+.huemap-legend-item:hover { background: rgba(0,0,0,0.05); }
+.huemap-legend-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.huemap-tooltip {
+    position: absolute; background: var(--bg-modal); border: 1px solid var(--border-color);
+    border-radius: 8px; padding: 0.5rem 0.7rem; font-size: 0.75rem; color: var(--text-primary);
+    box-shadow: var(--shadow-sm); pointer-events: none; z-index: 10; display: none; white-space: nowrap;
+}
+.huemap-filter-wrap {
+    display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; justify-content: center;
+}
+.huemap-filter-btn {
+    padding: 0.25rem 0.6rem; font-size: 0.72rem; font-family: var(--font-jp);
+    border: 1px solid var(--border-color); border-radius: 6px; background: rgba(0,0,0,0.02);
+    color: var(--text-secondary); cursor: pointer; transition: var(--transition-smooth);
+}
+.huemap-filter-btn.active { background: var(--accent-teal); color: #fff; border-color: var(--accent-teal); }
+body.dark-theme .huemap-filter-btn { background: rgba(255,255,255,0.05); }
+body.dark-theme .huemap-filter-btn.active { background: var(--accent-teal); }
+
 /* ===== Collections ===== */
 .collections-btn {
     display: inline-flex;
@@ -3391,6 +3446,13 @@ body.dark-theme .pmatch-result-item { background: rgba(255,255,255,0.03); }
                     <span>カレンダー</span>
                 </button>
 
+                <button id="huemapBtn" class="dash-btn" title="色相環マップ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                    </svg>
+                    <span>色相環</span>
+                </button>
+
                 <div class="fontsize-controls">
                     <button class="fontsize-btn" data-size="small" onclick="setFontSize('small')">小</button>
                     <button class="fontsize-btn active" data-size="medium" onclick="setFontSize('medium')">中</button>
@@ -3725,6 +3787,23 @@ body.dark-theme .pmatch-result-item { background: rgba(255,255,255,0.03); }
                 </div>
             </div>
             <div id="compareResult"></div>
+        </div>
+    </div>
+
+    <!-- Hue Map Modal -->
+    <div class="huemap-overlay" id="huemapOverlay">
+        <div class="huemap-container">
+            <button class="huemap-close" id="huemapClose">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="huemap-title">色相環マップ</div>
+            <div class="huemap-desc">レシピを色味の傾向で配置。外側ほど高彩度、角度で暖色↔寒色</div>
+            <div class="huemap-filter-wrap" id="huemapFilters"></div>
+            <div class="huemap-canvas-wrap">
+                <canvas id="huemapCanvas" width="500" height="500"></canvas>
+                <div class="huemap-tooltip" id="huemapTooltip"></div>
+            </div>
+            <div class="huemap-legend" id="huemapLegend"></div>
         </div>
     </div>
 
@@ -13107,6 +13186,227 @@ function setupBlend() {
     });
 }
 
+// ===== Hue Map =====
+const HUE_SIM_COLORS = {
+    'Velvia': '#e63946', 'Astia': '#f4a261', 'Provia': '#2a9d8f', 'Provia/STD': '#2a9d8f',
+    'Classic Chrome': '#e9c46a', 'Classic Negative': '#d4a373', 'PRO Neg. Std': '#8d99ae',
+    'PRO Neg. Hi': '#6c757d', 'Eterna': '#457b9d', 'Eterna Bleach Bypass': '#adb5bd',
+    'Nostalgic Neg.': '#dda15e', 'Reala Ace': '#52b788', 'Monochrome': '#495057',
+    'Acros': '#212529', 'Acros+G': '#343a40', 'Monochrome+G': '#555'
+};
+
+let huemapDots = [];
+let huemapFilter = 'all';
+
+function getRecipeHueProfile(recipe) {
+    const sim = (recipe.settings.film_simulation || '').replace(/&nbsp;/g, ' ').trim();
+    let profile = null;
+    for (const key in SIM_PROFILES) {
+        if (sim.toLowerCase().includes(key.toLowerCase())) { profile = SIM_PROFILES[key]; break; }
+    }
+    if (!profile) profile = SIM_PROFILES['Provia'];
+
+    const adj = settingsAdjust(recipe);
+    const sat = Math.max(0, Math.min(1, profile.sat + adj.satAdj));
+    const warm = profile.warm;
+    const isMono = profile.mono;
+
+    let angle;
+    if (isMono) {
+        angle = Math.PI * 1.5 + (Math.random() - 0.5) * 0.4;
+    } else {
+        angle = warm * Math.PI * 1.2 - Math.PI * 0.1 + (Math.random() - 0.5) * 0.3;
+    }
+
+    const radius = isMono ? 0.1 + Math.random() * 0.15 : 0.2 + sat * 0.7 + (Math.random() - 0.5) * 0.08;
+
+    let dotColor = '#888';
+    for (const key in HUE_SIM_COLORS) {
+        if (sim.toLowerCase().includes(key.toLowerCase())) { dotColor = HUE_SIM_COLORS[key]; break; }
+    }
+
+    return { angle, radius: Math.min(0.95, radius), color: dotColor, sim };
+}
+
+function renderHueMap() {
+    const canvas = document.getElementById('huemapCanvas');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    const cx = w / 2, cy = h / 2;
+    const maxR = w / 2 - 20;
+
+    ctx.clearRect(0, 0, w, h);
+
+    const isDark = document.body.classList.contains('dark-theme');
+
+    for (let r = maxR; r > 0; r -= 2) {
+        const ratio = r / maxR;
+        const alpha = 0.03 + ratio * 0.04;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = isDark ? `rgba(255,255,255,${alpha})` : `rgba(0,0,0,${alpha})`;
+        ctx.stroke();
+    }
+
+    for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2 - Math.PI / 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(a) * maxR, cy + Math.sin(a) * maxR);
+        ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+        ctx.stroke();
+    }
+
+    const labels = [
+        { text: '暖色', angle: Math.PI * 0.3 },
+        { text: '寒色', angle: Math.PI * 1.0 },
+        { text: 'モノクロ', angle: Math.PI * 1.5 },
+    ];
+    ctx.font = '11px sans-serif';
+    ctx.fillStyle = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.35)';
+    ctx.textAlign = 'center';
+    labels.forEach(l => {
+        const lx = cx + Math.cos(l.angle) * (maxR + 12);
+        const ly = cy + Math.sin(l.angle) * (maxR + 12);
+        ctx.fillText(l.text, lx, ly + 4);
+    });
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.2)';
+    ctx.font = '10px sans-serif';
+    ctx.fillText('低彩度', cx, cy + 4);
+    ctx.fillText('高彩度', cx + maxR * 0.7, cy - maxR * 0.7);
+
+    const combined = getCombinedRecipes();
+    huemapDots = [];
+
+    combined.forEach(recipe => {
+        const sim = (recipe.settings.film_simulation || '').replace(/&nbsp;/g, ' ').trim();
+        if (huemapFilter !== 'all') {
+            let matchFilter = false;
+            for (const key of huemapFilter.split(',')) {
+                if (sim.toLowerCase().includes(key.toLowerCase())) { matchFilter = true; break; }
+            }
+            if (!matchFilter) return;
+        }
+
+        const prof = getRecipeHueProfile(recipe);
+        const x = cx + Math.cos(prof.angle) * prof.radius * maxR;
+        const y = cy + Math.sin(prof.angle) * prof.radius * maxR;
+        const dotR = 5;
+
+        ctx.beginPath();
+        ctx.arc(x, y, dotR, 0, Math.PI * 2);
+        ctx.fillStyle = prof.color;
+        ctx.globalAlpha = 0.75;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+
+        huemapDots.push({ x, y, r: dotR, recipe, sim: prof.sim, color: prof.color });
+    });
+}
+
+function setupHueMap() {
+    const overlay = document.getElementById('huemapOverlay');
+    document.getElementById('huemapClose').addEventListener('click', () => overlay.classList.remove('open'));
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+
+    document.getElementById('huemapBtn').addEventListener('click', () => {
+        huemapFilter = 'all';
+        overlay.classList.add('open');
+        setTimeout(() => {
+            renderHueMapFilters();
+            renderHueMap();
+            renderHueMapLegend();
+        }, 50);
+    });
+
+    const canvas = document.getElementById('huemapCanvas');
+    const tooltip = document.getElementById('huemapTooltip');
+
+    canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const mx = (e.clientX - rect.left) * scaleX;
+        const my = (e.clientY - rect.top) * scaleY;
+
+        let found = null;
+        for (const dot of huemapDots) {
+            const dist = Math.sqrt((mx - dot.x) ** 2 + (my - dot.y) ** 2);
+            if (dist <= dot.r + 3) { found = dot; break; }
+        }
+
+        if (found) {
+            tooltip.style.display = 'block';
+            tooltip.innerHTML = `<strong>${found.recipe.title}</strong><br><span style="color:${found.color}">${found.sim}</span>`;
+            const tx = e.clientX - canvas.closest('.huemap-canvas-wrap').getBoundingClientRect().left + 12;
+            const ty = e.clientY - canvas.closest('.huemap-canvas-wrap').getBoundingClientRect().top - 10;
+            tooltip.style.left = tx + 'px';
+            tooltip.style.top = ty + 'px';
+        } else {
+            tooltip.style.display = 'none';
+        }
+    });
+
+    canvas.addEventListener('click', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const mx = (e.clientX - rect.left) * scaleX;
+        const my = (e.clientY - rect.top) * scaleY;
+
+        for (const dot of huemapDots) {
+            const dist = Math.sqrt((mx - dot.x) ** 2 + (my - dot.y) ** 2);
+            if (dist <= dot.r + 3) {
+                overlay.classList.remove('open');
+                openModal(dot.recipe);
+                break;
+            }
+        }
+    });
+
+    canvas.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+}
+
+function renderHueMapFilters() {
+    const filters = [
+        { label: 'すべて', value: 'all' },
+        { label: 'Velvia', value: 'Velvia' },
+        { label: 'Astia', value: 'Astia' },
+        { label: 'Classic Chrome', value: 'Classic Chrome' },
+        { label: 'Classic Neg.', value: 'Classic Negative' },
+        { label: 'Nostalgic Neg.', value: 'Nostalgic Neg' },
+        { label: 'Eterna', value: 'Eterna' },
+        { label: 'Reala Ace', value: 'Reala Ace' },
+        { label: 'PRO Neg.', value: 'PRO Neg' },
+        { label: 'モノクロ', value: 'Acros,Monochrome' },
+    ];
+
+    const wrap = document.getElementById('huemapFilters');
+    wrap.innerHTML = filters.map(f =>
+        `<button class="huemap-filter-btn ${huemapFilter === f.value ? 'active' : ''}" data-val="${f.value}">${f.label}</button>`
+    ).join('');
+
+    wrap.querySelectorAll('.huemap-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            huemapFilter = btn.dataset.val;
+            renderHueMapFilters();
+            renderHueMap();
+        });
+    });
+}
+
+function renderHueMapLegend() {
+    const sims = Object.entries(HUE_SIM_COLORS);
+    document.getElementById('huemapLegend').innerHTML = sims.map(([name, color]) =>
+        `<span class="huemap-legend-item"><span class="huemap-legend-dot" style="background:${color}"></span>${name}</span>`
+    ).join('');
+}
+
 // ===== Similar Recipes =====
 function findSimilarRecipes(recipe, maxCount = 5) {
     const combined = getCombinedRecipes();
@@ -14633,15 +14933,18 @@ function setupEventListeners() {
 
     setupPhotoMatch();
     setupBlend();
+    setupHueMap();
     populateLocationFilter();
 
     document.getElementById('locationInput').addEventListener('change', saveMemoForRecipe);
 
     const pmatchOverlay = document.getElementById('pmatchOverlay');
     const blendOverlay = document.getElementById('blendOverlay');
+    const huemapOverlay = document.getElementById('huemapOverlay');
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            if (blendOverlay.classList.contains('open')) { blendOverlay.classList.remove('open'); }
+            if (huemapOverlay.classList.contains('open')) { huemapOverlay.classList.remove('open'); }
+            else if (blendOverlay.classList.contains('open')) { blendOverlay.classList.remove('open'); }
             else if (pmatchOverlay.classList.contains('open')) { pmatchOverlay.classList.remove('open'); }
             else if (randomOverlay.classList.contains('open')) { randomOverlay.classList.remove('open'); }
             else if (printOverlay.classList.contains('open')) { printOverlay.classList.remove('open'); }
