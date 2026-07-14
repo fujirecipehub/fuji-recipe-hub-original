@@ -3797,7 +3797,7 @@ body.dark-theme .pmatch-result-item { background: rgba(255,255,255,0.03); }
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
             <div class="huemap-title">色相環マップ</div>
-            <div class="huemap-desc">レシピを色味の傾向で配置。外側ほど高彩度、角度で暖色↔寒色</div>
+            <div class="huemap-desc">マイレシピを色味の傾向で配置。外側ほど高彩度、角度で暖色↔寒色</div>
             <div class="huemap-filter-wrap" id="huemapFilters"></div>
             <div class="huemap-canvas-wrap">
                 <canvas id="huemapCanvas" width="500" height="500"></canvas>
@@ -13277,10 +13277,10 @@ function renderHueMap() {
     ctx.fillText('低彩度', cx, cy + 4);
     ctx.fillText('高彩度', cx + maxR * 0.7, cy - maxR * 0.7);
 
-    const combined = getCombinedRecipes();
+    const myOnly = myRecipes.map(r => ({ ...r, generation: 'myrecipe', isMyRecipe: true }));
     huemapDots = [];
 
-    combined.forEach(recipe => {
+    myOnly.forEach(recipe => {
         const sim = (recipe.settings.film_simulation || '').replace(/&nbsp;/g, ' ').trim();
         if (huemapFilter !== 'all') {
             let matchFilter = false;
