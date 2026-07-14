@@ -2786,6 +2786,145 @@ body.dark-theme .cal-entry-item { background: rgba(255,255,255,0.03); }
 }
 .cal-log-btn:hover { background: #047857; }
 
+/* Photo Match */
+.pmatch-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.pmatch-overlay.open { display: flex; }
+.pmatch-container {
+    background: var(--bg-modal);
+    border-radius: 16px;
+    max-width: 560px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 1.5rem;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+}
+.pmatch-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0.25rem;
+}
+.pmatch-close svg { width: 20px; height: 20px; }
+.pmatch-title {
+    font-family: var(--font-outfit);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+.pmatch-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+.pmatch-upload-area {
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 2rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 1rem;
+    position: relative;
+}
+.pmatch-upload-area:hover { border-color: var(--accent-teal); background: rgba(16,185,129,0.03); }
+.pmatch-upload-area.has-image { padding: 0.5rem; }
+.pmatch-upload-area svg { width: 40px; height: 40px; color: var(--text-muted); margin-bottom: 0.5rem; }
+.pmatch-upload-text { font-size: 0.85rem; color: var(--text-muted); }
+.pmatch-preview { max-width: 100%; max-height: 250px; border-radius: 8px; display: none; }
+.pmatch-upload-area.has-image .pmatch-preview { display: block; }
+.pmatch-upload-area.has-image svg,
+.pmatch-upload-area.has-image .pmatch-upload-text { display: none; }
+.pmatch-analyze-btn {
+    width: 100%;
+    padding: 0.7rem;
+    background: var(--accent-teal);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: var(--font-jp);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: none;
+}
+.pmatch-analyze-btn:hover { background: #047857; }
+.pmatch-analyze-btn.visible { display: block; }
+.pmatch-analysis {
+    margin-top: 1rem;
+    padding: 0.8rem;
+    background: rgba(0,0,0,0.03);
+    border-radius: 8px;
+    display: none;
+}
+body.dark-theme .pmatch-analysis { background: rgba(255,255,255,0.05); }
+.pmatch-analysis.visible { display: block; }
+.pmatch-analysis-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+.pmatch-traits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.8rem;
+}
+.pmatch-trait {
+    font-size: 0.72rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    background: var(--accent-teal);
+    color: white;
+}
+.pmatch-results-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 1rem 0 0.5rem;
+}
+.pmatch-result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.8rem;
+    background: rgba(0,0,0,0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 0.4rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.pmatch-result-item:hover { background: var(--bg-surface-hover); }
+body.dark-theme .pmatch-result-item { background: rgba(255,255,255,0.03); }
+.pmatch-result-info { flex: 1; }
+.pmatch-result-name { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
+.pmatch-result-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+.pmatch-result-score {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+    min-width: 45px;
+    text-align: right;
+}
+
 /* Random Recipe Generation Picker */
 .random-overlay {
     position: fixed;
@@ -3124,6 +3263,13 @@ body.dark-theme .cal-entry-item { background: rgba(255,255,255,0.03); }
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
                     </svg>
                     <span>おすすめ</span>
+                </button>
+
+                <button id="photoMatchBtn" class="dash-btn" title="写真からレシピ提案">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>写真解析</span>
                 </button>
 
                 <button id="printBtn" class="dash-btn" title="印刷">
@@ -3582,6 +3728,29 @@ body.dark-theme .cal-entry-item { background: rgba(255,255,255,0.03); }
     <div id="printArea" style="display:none;"></div>
 
     <!-- Calendar Modal -->
+    <div class="pmatch-overlay" id="pmatchOverlay">
+        <div class="pmatch-container">
+            <button class="pmatch-close" id="pmatchClose">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="pmatch-title">写真からレシピ提案</div>
+            <div class="pmatch-desc">好きな写真をアップロードすると、色味やトーンを分析して近いレシピを提案します</div>
+            <div class="pmatch-upload-area" id="pmatchUploadArea">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                <div class="pmatch-upload-text">タップして写真を選択<br>またはドラッグ＆ドロップ</div>
+                <img class="pmatch-preview" id="pmatchPreview" />
+            </div>
+            <input type="file" id="pmatchFileInput" accept="image/*" style="display:none" />
+            <button class="pmatch-analyze-btn" id="pmatchAnalyzeBtn">この写真を解析する</button>
+            <div class="pmatch-analysis" id="pmatchAnalysis">
+                <div class="pmatch-analysis-title">解析結果</div>
+                <div class="pmatch-traits" id="pmatchTraits"></div>
+            </div>
+            <div class="pmatch-results-title" id="pmatchResultsTitle" style="display:none">おすすめレシピ</div>
+            <div id="pmatchResults"></div>
+        </div>
+    </div>
+
     <div class="random-overlay" id="randomOverlay">
         <div class="random-container">
             <button class="random-close" id="randomClose">
@@ -13493,6 +13662,260 @@ function copySettings() {
     });
 }
 
+// ===== Photo Match =====
+const SIM_PROFILES = {
+    'Velvia': { sat: 0.75, warm: 0.55, contrast: 0.7, bright: 0.55, mono: false },
+    'Astia': { sat: 0.55, warm: 0.5, contrast: 0.45, bright: 0.6, mono: false },
+    'Provia': { sat: 0.5, warm: 0.5, contrast: 0.5, bright: 0.55, mono: false },
+    'Provia/STD': { sat: 0.5, warm: 0.5, contrast: 0.5, bright: 0.55, mono: false },
+    'Classic Chrome': { sat: 0.4, warm: 0.55, contrast: 0.55, bright: 0.45, mono: false },
+    'Classic Negative': { sat: 0.45, warm: 0.6, contrast: 0.5, bright: 0.45, mono: false },
+    'PRO Neg. Std': { sat: 0.35, warm: 0.48, contrast: 0.4, bright: 0.5, mono: false },
+    'PRO Neg. Hi': { sat: 0.45, warm: 0.48, contrast: 0.55, bright: 0.5, mono: false },
+    'Eterna': { sat: 0.3, warm: 0.48, contrast: 0.3, bright: 0.5, mono: false },
+    'Eterna Bleach Bypass': { sat: 0.2, warm: 0.45, contrast: 0.7, bright: 0.4, mono: false },
+    'Nostalgic Neg.': { sat: 0.45, warm: 0.6, contrast: 0.45, bright: 0.55, mono: false },
+    'Reala Ace': { sat: 0.5, warm: 0.52, contrast: 0.45, bright: 0.55, mono: false },
+    'Monochrome': { sat: 0, warm: 0.5, contrast: 0.5, bright: 0.5, mono: true },
+    'Acros': { sat: 0, warm: 0.5, contrast: 0.6, bright: 0.45, mono: true }
+};
+
+function analyzeImage(img) {
+    const canvas = document.createElement('canvas');
+    const size = 200;
+    const aspect = img.naturalWidth / img.naturalHeight;
+    canvas.width = aspect >= 1 ? size : Math.round(size * aspect);
+    canvas.height = aspect >= 1 ? Math.round(size / aspect) : size;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    const px = canvas.width * canvas.height;
+
+    let totalH = 0, totalS = 0, totalL = 0;
+    let warmCount = 0, coolCount = 0;
+    const lums = [];
+    let chromaSum = 0;
+
+    for (let i = 0; i < data.length; i += 4) {
+        const r = data[i] / 255, g = data[i+1] / 255, b = data[i+2] / 255;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        const l = (max + min) / 2;
+        const d = max - min;
+        let h = 0, s = 0;
+        if (d > 0) {
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+            else if (max === g) h = ((b - r) / d + 2) / 6;
+            else h = ((r - g) / d + 4) / 6;
+        }
+        totalH += h; totalS += s; totalL += l;
+        lums.push(l);
+        chromaSum += d;
+        const hDeg = h * 360;
+        if ((hDeg >= 0 && hDeg < 70) || hDeg > 290) warmCount++;
+        else if (hDeg >= 140 && hDeg <= 290) coolCount++;
+    }
+
+    const avgS = totalS / px;
+    const avgL = totalL / px;
+    const avgH = totalH / px;
+    const avgChroma = chromaSum / px;
+
+    lums.sort((a, b) => a - b);
+    const p10 = lums[Math.floor(px * 0.1)];
+    const p90 = lums[Math.floor(px * 0.9)];
+    const contrast = p90 - p10;
+
+    const warmRatio = warmCount / (warmCount + coolCount + 1);
+    const isMono = avgChroma < 0.05;
+
+    return {
+        saturation: Math.min(1, avgS * 1.5),
+        warmth: warmRatio,
+        contrast: Math.min(1, contrast * 1.2),
+        brightness: avgL,
+        isMono: isMono,
+        avgHue: avgH * 360
+    };
+}
+
+function settingsAdjust(recipe) {
+    let satAdj = 0, contAdj = 0, brightAdj = 0;
+    const s = recipe.settings;
+    const color = parseInt(s.color) || 0;
+    satAdj += color * 0.06;
+    const hl = parseInt(s.highlight_tone) || 0;
+    const sh = parseInt(s.shadow_tone) || 0;
+    contAdj += (hl - sh) * 0.04;
+    const exp = parseFloat(s.exposure_compensation) || 0;
+    brightAdj += exp * 0.05;
+    return { satAdj, contAdj, brightAdj };
+}
+
+function matchRecipes(analysis) {
+    const combined = getCombinedRecipes();
+    const scored = combined.map(r => {
+        const sim = (r.settings.film_simulation || '').replace(/&nbsp;/g, ' ').trim();
+        let profile = null;
+        for (const key in SIM_PROFILES) {
+            if (sim.toLowerCase().includes(key.toLowerCase())) { profile = SIM_PROFILES[key]; break; }
+        }
+        if (!profile) profile = SIM_PROFILES['Provia'];
+
+        const adj = settingsAdjust(r);
+        const pSat = Math.max(0, Math.min(1, profile.sat + adj.satAdj));
+        const pCon = Math.max(0, Math.min(1, profile.contrast + adj.contAdj));
+        const pBri = Math.max(0, Math.min(1, profile.bright + adj.brightAdj));
+
+        if (analysis.isMono && !profile.mono) return { recipe: r, score: 0 };
+        if (!analysis.isMono && profile.mono) return { recipe: r, score: 0 };
+
+        const satDiff = Math.abs(analysis.saturation - pSat);
+        const warmDiff = Math.abs(analysis.warmth - profile.warm);
+        const conDiff = Math.abs(analysis.contrast - pCon);
+        const briDiff = Math.abs(analysis.brightness - pBri);
+
+        const dist = satDiff * 0.35 + warmDiff * 0.25 + conDiff * 0.25 + briDiff * 0.15;
+        const score = Math.max(0, Math.round(100 * (1 - dist)));
+        return { recipe: r, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, 8).filter(s => s.score > 0);
+}
+
+function getTraitLabels(a) {
+    const traits = [];
+    if (a.isMono) { traits.push('モノクロ'); }
+    else {
+        if (a.saturation > 0.55) traits.push('高彩度');
+        else if (a.saturation < 0.3) traits.push('低彩度');
+        else traits.push('中彩度');
+    }
+    if (a.warmth > 0.6) traits.push('暖色系');
+    else if (a.warmth < 0.4) traits.push('寒色系');
+    else traits.push('ニュートラル');
+    if (a.contrast > 0.55) traits.push('ハイコントラスト');
+    else if (a.contrast < 0.35) traits.push('ローコントラスト');
+    if (a.brightness > 0.6) traits.push('明るめ');
+    else if (a.brightness < 0.4) traits.push('暗め');
+    return traits;
+}
+
+function openPhotoMatch() {
+    const overlay = document.getElementById('pmatchOverlay');
+    const uploadArea = document.getElementById('pmatchUploadArea');
+    const preview = document.getElementById('pmatchPreview');
+    const analyzeBtn = document.getElementById('pmatchAnalyzeBtn');
+    const analysisDiv = document.getElementById('pmatchAnalysis');
+    const resultsTitle = document.getElementById('pmatchResultsTitle');
+    const resultsDiv = document.getElementById('pmatchResults');
+
+    uploadArea.classList.remove('has-image');
+    preview.style.display = 'none';
+    preview.src = '';
+    analyzeBtn.classList.remove('visible');
+    analysisDiv.classList.remove('visible');
+    resultsTitle.style.display = 'none';
+    resultsDiv.innerHTML = '';
+    document.getElementById('pmatchFileInput').value = '';
+
+    overlay.classList.add('open');
+}
+
+function setupPhotoMatch() {
+    const overlay = document.getElementById('pmatchOverlay');
+    const uploadArea = document.getElementById('pmatchUploadArea');
+    const fileInput = document.getElementById('pmatchFileInput');
+    const preview = document.getElementById('pmatchPreview');
+    const analyzeBtn = document.getElementById('pmatchAnalyzeBtn');
+
+    document.getElementById('pmatchClose').addEventListener('click', () => overlay.classList.remove('open'));
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+    document.getElementById('photoMatchBtn').addEventListener('click', openPhotoMatch);
+
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.style.borderColor = 'var(--accent-teal)'; });
+    uploadArea.addEventListener('dragleave', () => { uploadArea.style.borderColor = ''; });
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '';
+        if (e.dataTransfer.files.length) loadPhotoMatchFile(e.dataTransfer.files[0]);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) loadPhotoMatchFile(e.target.files[0]);
+    });
+
+    analyzeBtn.addEventListener('click', runPhotoMatch);
+}
+
+function loadPhotoMatchFile(file) {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const preview = document.getElementById('pmatchPreview');
+        const uploadArea = document.getElementById('pmatchUploadArea');
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+        uploadArea.classList.add('has-image');
+        document.getElementById('pmatchAnalyzeBtn').classList.add('visible');
+        document.getElementById('pmatchAnalysis').classList.remove('visible');
+        document.getElementById('pmatchResultsTitle').style.display = 'none';
+        document.getElementById('pmatchResults').innerHTML = '';
+    };
+    reader.readAsDataURL(file);
+}
+
+function runPhotoMatch() {
+    const preview = document.getElementById('pmatchPreview');
+    if (!preview.src) return;
+
+    const img = new Image();
+    img.onload = () => {
+        const analysis = analyzeImage(img);
+        const traits = getTraitLabels(analysis);
+        const results = matchRecipes(analysis);
+
+        document.getElementById('pmatchTraits').innerHTML = traits.map(t => `<span class="pmatch-trait">${t}</span>`).join('');
+        document.getElementById('pmatchAnalysis').classList.add('visible');
+
+        const resultsDiv = document.getElementById('pmatchResults');
+        const resultsTitle = document.getElementById('pmatchResultsTitle');
+
+        if (results.length === 0) {
+            resultsTitle.style.display = 'block';
+            resultsDiv.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:1rem;font-size:0.85rem;">マッチするレシピが見つかりませんでした</div>';
+            return;
+        }
+
+        resultsTitle.style.display = 'block';
+        resultsDiv.innerHTML = results.map(({ recipe, score }) => {
+            const sim = (recipe.settings.film_simulation || '').replace(/&nbsp;/g, ' ').trim();
+            const gen = recipe.isMyRecipe ? 'マイレシピ' : (recipe.generation || '');
+            return `<div class="pmatch-result-item" data-id="${recipe.id}" data-myrecipe="${recipe.isMyRecipe || false}">
+                <div class="pmatch-result-info">
+                    <div class="pmatch-result-name">${recipe.title}</div>
+                    <div class="pmatch-result-meta">${sim} / ${gen}</div>
+                </div>
+                <div class="pmatch-result-score">${score}%</div>
+            </div>`;
+        }).join('');
+
+        resultsDiv.querySelectorAll('.pmatch-result-item').forEach(el => {
+            el.addEventListener('click', () => {
+                const id = el.dataset.id;
+                const isMyRecipe = el.dataset.myrecipe === 'true';
+                let target;
+                if (isMyRecipe) { target = myRecipes.find(r => r.id === id); if (target) target = { ...target, generation: 'myrecipe', isMyRecipe: true }; }
+                else { target = allRecipes.find(r => r.id === id); }
+                if (target) { document.getElementById('pmatchOverlay').classList.remove('open'); openModal(target); }
+            });
+        });
+    };
+    img.src = preview.src;
+}
+
 // ===== Weather/Scene Recommend =====
 const WEATHER_SIM_MAP = {
     sunny: { sims: ['Velvia', 'Astia', 'Provia', 'Provia/STD', 'Classic Chrome', 'Reala Ace'], reason: '晴天に映える鮮やかな発色' },
@@ -13921,9 +14344,13 @@ function setupEventListeners() {
     document.getElementById('calPrev').addEventListener('click', () => { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); });
     document.getElementById('calNext').addEventListener('click', () => { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); });
 
+    setupPhotoMatch();
+
+    const pmatchOverlay = document.getElementById('pmatchOverlay');
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            if (randomOverlay.classList.contains('open')) { randomOverlay.classList.remove('open'); }
+            if (pmatchOverlay.classList.contains('open')) { pmatchOverlay.classList.remove('open'); }
+            else if (randomOverlay.classList.contains('open')) { randomOverlay.classList.remove('open'); }
             else if (printOverlay.classList.contains('open')) { printOverlay.classList.remove('open'); }
             else if (qrOverlay.classList.contains('open')) { qrOverlay.classList.remove('open'); }
             else if (weatherOverlay.classList.contains('open')) { weatherOverlay.classList.remove('open'); }
