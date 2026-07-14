@@ -13793,6 +13793,9 @@ function setupEventListeners() {
     });
 
     memoSaveBtn.addEventListener('click', saveMemoForRecipe);
+    document.querySelectorAll('#starRating input').forEach(inp => {
+        inp.addEventListener('change', saveMemoForRecipe);
+    });
     randomRecipeBtn.addEventListener('click', openRandomRecipe);
     darkModeToggle.addEventListener('click', toggleDarkMode);
     sortSelect.addEventListener('change', () => {
