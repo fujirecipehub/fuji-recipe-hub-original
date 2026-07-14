@@ -3532,6 +3532,20 @@ body.dark-theme .cal-entry-item { background: rgba(255,255,255,0.03); }
                         <option value="indoor">室内</option>
                     </select>
                 </div>
+                <div class="weather-sel-group">
+                    <label>センサー</label>
+                    <select id="weatherGeneration">
+                        <option value="all">すべて</option>
+                        <option value="myrecipe">MY</option>
+                        <option value="X-Trans I">X-Trans I</option>
+                        <option value="X-Trans II">X-Trans II</option>
+                        <option value="X-Trans III">X-Trans III</option>
+                        <option value="X-Trans IV">X-Trans IV</option>
+                        <option value="X-Trans V">X-Trans V</option>
+                        <option value="Bayer">Bayer</option>
+                        <option value="GFX">GFX</option>
+                    </select>
+                </div>
             </div>
             <div class="weather-results" id="weatherResults"></div>
         </div>
@@ -13492,6 +13506,7 @@ const WEATHER_SIM_MAP = {
 function getWeatherRecommend() {
     const weather = document.getElementById('weatherCondition').value;
     const scene = document.getElementById('weatherScene').value;
+    const gen = document.getElementById('weatherGeneration').value;
     const mapping = WEATHER_SIM_MAP[weather];
     if (!mapping) return;
 
@@ -13500,6 +13515,10 @@ function getWeatherRecommend() {
     const sceneMap = { portrait: 'ポートレート', landscape: '風景', street: 'ストリート', indoor: '日常' };
 
     const matched = combined.filter(r => {
+        if (gen !== 'all') {
+            if (gen === 'myrecipe') { if (!r.isMyRecipe) return false; }
+            else { if (r.isMyRecipe || r.generation !== gen) return false; }
+        }
         const sim = (r.settings.film_simulation || '').replace(/&nbsp;/g, ' ').trim();
         if (!mapping.sims.some(s => sim.toLowerCase().includes(s.toLowerCase()))) return false;
         if (scene !== 'any') {
@@ -13893,6 +13912,7 @@ function setupEventListeners() {
     weatherOverlay.addEventListener('click', (e) => { if (e.target === weatherOverlay) weatherOverlay.classList.remove('open'); });
     document.getElementById('weatherCondition').addEventListener('change', getWeatherRecommend);
     document.getElementById('weatherScene').addEventListener('change', getWeatherRecommend);
+    document.getElementById('weatherGeneration').addEventListener('change', getWeatherRecommend);
 
     // Calendar
     document.getElementById('calBtn').addEventListener('click', openCalendar);
