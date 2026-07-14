@@ -2786,6 +2786,84 @@ body.dark-theme .cal-entry-item { background: rgba(255,255,255,0.03); }
 }
 .cal-log-btn:hover { background: #047857; }
 
+/* Random Recipe Generation Picker */
+.random-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.random-overlay.open { display: flex; }
+.random-container {
+    background: var(--bg-modal);
+    border-radius: 16px;
+    max-width: 400px;
+    width: 100%;
+    padding: 1.5rem;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+}
+.random-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0.25rem;
+}
+.random-close svg { width: 20px; height: 20px; }
+.random-title {
+    font-family: var(--font-outfit);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+.random-gen-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.random-gen-btn {
+    padding: 0.6rem 0.4rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 0.78rem;
+    font-family: var(--font-jp);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+.random-gen-btn:hover { background: var(--bg-surface-hover); }
+.random-gen-btn.active {
+    background: var(--accent-teal);
+    color: white;
+    border-color: var(--accent-teal);
+}
+.random-go-btn {
+    width: 100%;
+    padding: 0.7rem;
+    background: var(--accent-teal);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: var(--font-jp);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.random-go-btn:hover { background: #047857; }
+
 /* Print Recipe Cards */
 .print-overlay {
     position: fixed;
@@ -3490,6 +3568,27 @@ body.dark-theme .cal-entry-item { background: rgba(255,255,255,0.03); }
     <div id="printArea" style="display:none;"></div>
 
     <!-- Calendar Modal -->
+    <div class="random-overlay" id="randomOverlay">
+        <div class="random-container">
+            <button class="random-close" id="randomClose">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="random-title">今日のレシピ</div>
+            <div class="random-gen-grid" id="randomGenGrid">
+                <button class="random-gen-btn active" data-gen="all">すべて</button>
+                <button class="random-gen-btn" data-gen="myrecipe">MY</button>
+                <button class="random-gen-btn" data-gen="X-Trans I">I</button>
+                <button class="random-gen-btn" data-gen="X-Trans II">II</button>
+                <button class="random-gen-btn" data-gen="X-Trans III">III</button>
+                <button class="random-gen-btn" data-gen="X-Trans IV">IV</button>
+                <button class="random-gen-btn" data-gen="X-Trans V">V</button>
+                <button class="random-gen-btn" data-gen="Bayer">Bayer</button>
+                <button class="random-gen-btn" data-gen="GFX">GFX</button>
+            </div>
+            <button class="random-go-btn" id="randomGoBtn">このセンサーからランダムに選ぶ</button>
+        </div>
+    </div>
+
     <div class="cal-overlay" id="calOverlay">
         <div class="cal-container">
             <button class="cal-close" id="calClose">
@@ -11188,7 +11287,7 @@ function renderRecipes() {
                     break;
                 }
             }
-            return inTitle || inSim || inSettings;
+            if (!(inTitle || inSim || inSettings)) return false;
         }
 
         if (activeTagFilter) {
@@ -12639,10 +12738,31 @@ function saveMemoForRecipe() {
 }
 
 // ===== Random Recipe =====
+let randomGenFilter = 'all';
+
 function openRandomRecipe() {
+    randomGenFilter = 'all';
+    const btns = document.querySelectorAll('#randomGenGrid .random-gen-btn');
+    btns.forEach(b => b.classList.toggle('active', b.dataset.gen === 'all'));
+    document.getElementById('randomOverlay').classList.add('open');
+}
+
+function executeRandomRecipe() {
     const combined = getCombinedRecipes();
-    if (combined.length === 0) return;
-    const recipe = combined[Math.floor(Math.random() * combined.length)];
+    let pool;
+    if (randomGenFilter === 'all') {
+        pool = combined;
+    } else if (randomGenFilter === 'myrecipe') {
+        pool = combined.filter(r => r.isMyRecipe);
+    } else {
+        pool = combined.filter(r => !r.isMyRecipe && r.generation === randomGenFilter);
+    }
+    if (pool.length === 0) {
+        alert('該当するレシピがありません');
+        return;
+    }
+    document.getElementById('randomOverlay').classList.remove('open');
+    const recipe = pool[Math.floor(Math.random() * pool.length)];
     openModal(recipe);
 }
 
@@ -13751,6 +13871,19 @@ function setupEventListeners() {
     document.getElementById('modalCopyBtn').addEventListener('click', copySettings);
     document.getElementById('modalCalLogBtn').addEventListener('click', logRecipeToday);
 
+    // Random Recipe
+    const randomOverlay = document.getElementById('randomOverlay');
+    document.getElementById('randomClose').addEventListener('click', () => randomOverlay.classList.remove('open'));
+    randomOverlay.addEventListener('click', (e) => { if (e.target === randomOverlay) randomOverlay.classList.remove('open'); });
+    document.getElementById('randomGoBtn').addEventListener('click', executeRandomRecipe);
+    document.querySelectorAll('#randomGenGrid .random-gen-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#randomGenGrid .random-gen-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            randomGenFilter = btn.dataset.gen;
+        });
+    });
+
     // Weather
     document.getElementById('weatherBtn').addEventListener('click', () => { getWeatherRecommend(); weatherOverlay.classList.add('open'); });
     document.getElementById('weatherClose').addEventListener('click', () => weatherOverlay.classList.remove('open'));
@@ -13767,7 +13900,8 @@ function setupEventListeners() {
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            if (printOverlay.classList.contains('open')) { printOverlay.classList.remove('open'); }
+            if (randomOverlay.classList.contains('open')) { randomOverlay.classList.remove('open'); }
+            else if (printOverlay.classList.contains('open')) { printOverlay.classList.remove('open'); }
             else if (qrOverlay.classList.contains('open')) { qrOverlay.classList.remove('open'); }
             else if (weatherOverlay.classList.contains('open')) { weatherOverlay.classList.remove('open'); }
             else if (calOverlay.classList.contains('open')) { calOverlay.classList.remove('open'); }
