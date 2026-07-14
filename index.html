@@ -13302,7 +13302,7 @@ function renderHueMap() {
         const prof = getRecipeHueProfile(recipe);
         const x = cx + Math.cos(prof.angle) * prof.radius * maxR;
         const y = cy + Math.sin(prof.angle) * prof.radius * maxR;
-        const dotR = 12;
+        const dotR = 8;
 
         ctx.beginPath();
         ctx.arc(x, y, dotR, 0, Math.PI * 2);
