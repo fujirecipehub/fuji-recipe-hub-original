@@ -13198,6 +13198,12 @@ const HUE_SIM_COLORS = {
 let huemapDots = [];
 let huemapFilter = 'all';
 
+function stableHash(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) { h = ((h << 5) - h + str.charCodeAt(i)) | 0; }
+    return (h & 0x7fffffff) / 0x7fffffff;
+}
+
 function getRecipeHueProfile(recipe) {
     const sim = (recipe.settings.film_simulation || '').replace(/&nbsp;/g, ' ').trim();
     let profile = null;
@@ -13211,14 +13217,17 @@ function getRecipeHueProfile(recipe) {
     const warm = profile.warm;
     const isMono = profile.mono;
 
+    const h1 = stableHash(recipe.id || recipe.title);
+    const h2 = stableHash((recipe.id || recipe.title) + '_r');
+
     let angle;
     if (isMono) {
-        angle = Math.PI * 1.5 + (Math.random() - 0.5) * 0.4;
+        angle = Math.PI * 1.5 + (h1 - 0.5) * 0.4;
     } else {
-        angle = warm * Math.PI * 1.2 - Math.PI * 0.1 + (Math.random() - 0.5) * 0.3;
+        angle = warm * Math.PI * 1.2 - Math.PI * 0.1 + (h1 - 0.5) * 0.3;
     }
 
-    const radius = isMono ? 0.1 + Math.random() * 0.15 : 0.2 + sat * 0.7 + (Math.random() - 0.5) * 0.08;
+    const radius = isMono ? 0.1 + h2 * 0.15 : 0.2 + sat * 0.7 + (h2 - 0.5) * 0.08;
 
     let dotColor = '#888';
     for (const key in HUE_SIM_COLORS) {
@@ -13293,7 +13302,7 @@ function renderHueMap() {
         const prof = getRecipeHueProfile(recipe);
         const x = cx + Math.cos(prof.angle) * prof.radius * maxR;
         const y = cy + Math.sin(prof.angle) * prof.radius * maxR;
-        const dotR = 5;
+        const dotR = 12;
 
         ctx.beginPath();
         ctx.arc(x, y, dotR, 0, Math.PI * 2);
@@ -13337,7 +13346,7 @@ function setupHueMap() {
         let found = null;
         for (const dot of huemapDots) {
             const dist = Math.sqrt((mx - dot.x) ** 2 + (my - dot.y) ** 2);
-            if (dist <= dot.r + 3) { found = dot; break; }
+            if (dist <= dot.r + 8) { found = dot; break; }
         }
 
         if (found) {
@@ -13361,7 +13370,7 @@ function setupHueMap() {
 
         for (const dot of huemapDots) {
             const dist = Math.sqrt((mx - dot.x) ** 2 + (my - dot.y) ** 2);
-            if (dist <= dot.r + 3) {
+            if (dist <= dot.r + 8) {
                 overlay.classList.remove('open');
                 openModal(dot.recipe);
                 break;
