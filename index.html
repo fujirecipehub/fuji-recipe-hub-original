@@ -69,8 +69,10 @@ body {
     letter-spacing: 0.02em;
 }
 
-body.font-small { --font-size-base: 14px; }
-body.font-large { --font-size-base: 18px; }
+body.font-small { --font-size-base: 13px; font-size: 13px; }
+body.font-large { --font-size-base: 19px; font-size: 19px; }
+html:has(body.font-small) { font-size: 13px; }
+html:has(body.font-large) { font-size: 19px; }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
@@ -111,28 +113,28 @@ body.font-large { --font-size-base: 18px; }
 .brand {
     font-family: var(--font-outfit);
     font-weight: 800;
-    font-size: 2.2rem;
+    font-size: 35px;
     letter-spacing: 0.15em;
     color: var(--text-primary);
 }
 
 .separator {
     color: var(--accent-orange);
-    font-size: 1.8rem;
+    font-size: 29px;
     font-weight: 300;
 }
 
 .title {
     font-family: var(--font-outfit);
     font-weight: 400;
-    font-size: 1.8rem;
+    font-size: 29px;
     letter-spacing: 0.15em;
     color: var(--accent-gold);
 }
 
 .subtitle {
     color: var(--text-secondary);
-    font-size: 0.95rem;
+    font-size: 15px;
     font-weight: 400;
     opacity: 0.85;
 }
