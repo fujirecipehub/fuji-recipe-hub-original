@@ -2211,6 +2211,103 @@ body.dark-theme .compare-table tr.diff td {
     width: 30%;
 }
 
+/* ===== Recipe Blend ===== */
+.blend-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000;
+    display: none; align-items: center; justify-content: center; padding: 1rem;
+}
+.blend-overlay.open { display: flex; }
+.blend-container {
+    background: var(--bg-modal); border-radius: 16px; max-width: 720px; width: 100%;
+    max-height: 85vh; overflow-y: auto; padding: 1.5rem; position: relative; box-shadow: var(--shadow-lg);
+}
+.blend-close {
+    position: absolute; top: 1rem; right: 1rem; background: none; border: none;
+    cursor: pointer; color: var(--text-muted); padding: 0.25rem;
+}
+.blend-close svg { width: 20px; height: 20px; }
+.blend-title {
+    font-family: var(--font-outfit); font-size: 1.1rem; font-weight: 700;
+    margin-bottom: 1rem; color: var(--text-primary);
+}
+.blend-selectors { display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: flex-end; }
+.blend-select-wrap { flex: 1; min-width: 120px; }
+.blend-select-wrap label { display: block; font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+.blend-select-wrap select {
+    width: 100%; appearance: none; -webkit-appearance: none;
+    padding: 0.5rem 0.7rem; font-size: 0.82rem; font-family: var(--font-jp);
+    border: 1px solid var(--border-color); border-radius: 8px;
+    background: rgba(0,0,0,0.03); color: var(--text-primary); cursor: pointer;
+}
+body.dark-theme .blend-select-wrap select { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+.blend-ratio-wrap {
+    display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;
+    font-size: 0.82rem; color: var(--text-secondary);
+}
+.blend-ratio-wrap input[type="range"] { flex: 1; accent-color: var(--accent-teal); }
+.blend-ratio-labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-top: -0.5rem; margin-bottom: 0.75rem; }
+.blend-result-card {
+    background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 12px;
+    padding: 1rem; margin-bottom: 1rem;
+}
+body.dark-theme .blend-result-card { background: rgba(255,255,255,0.03); }
+.blend-result-title {
+    font-family: var(--font-outfit); font-size: 0.9rem; font-weight: 600;
+    color: var(--accent-teal); margin-bottom: 0.75rem;
+}
+.blend-result-table { width: 100%; border-collapse: collapse; }
+.blend-result-table th {
+    font-size: 0.7rem; font-weight: 600; color: var(--text-muted);
+    text-align: left; padding: 0.4rem 0.5rem; border-bottom: 2px solid var(--border-color);
+}
+.blend-result-table td {
+    font-size: 0.82rem; padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--border-color); color: var(--text-primary);
+}
+.blend-result-table td.setting-label { font-weight: 500; color: var(--text-secondary); width: 30%; }
+.blend-result-table td.blended { color: var(--accent-teal); font-weight: 600; }
+.blend-save-btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.55rem 1.2rem; background: var(--accent-teal); color: #fff;
+    border: none; border-radius: 8px; font-size: 0.82rem; font-family: var(--font-jp);
+    cursor: pointer; transition: var(--transition-smooth);
+}
+.blend-save-btn:hover { opacity: 0.85; }
+
+/* ===== Location Memo ===== */
+.location-input-wrap {
+    display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;
+}
+.location-input-wrap svg { width: 16px; height: 16px; color: var(--text-muted); flex-shrink: 0; }
+.location-input {
+    flex: 1; padding: 0.4rem 0.6rem; font-size: 0.82rem; font-family: var(--font-jp);
+    border: 1px solid var(--border-color); border-radius: 8px;
+    background: rgba(0,0,0,0.02); color: var(--text-primary);
+}
+body.dark-theme .location-input { background: rgba(255,255,255,0.05); }
+.location-input::placeholder { color: var(--text-muted); }
+.location-filter-wrap {
+    display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.3rem;
+}
+.location-filter-input {
+    flex: 1; padding: 0.35rem 0.6rem; font-size: 0.78rem; font-family: var(--font-jp);
+    border: 1px solid var(--border-color); border-radius: 6px;
+    background: rgba(0,0,0,0.02); color: var(--text-primary);
+}
+body.dark-theme .location-filter-input { background: rgba(255,255,255,0.05); }
+.location-tags-wrap { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.5rem; }
+.location-tag {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 0.25rem 0.6rem; background: rgba(0,0,0,0.04); border: 1px solid var(--border-color);
+    border-radius: 6px; font-size: 0.72rem; color: var(--text-secondary); cursor: pointer;
+    transition: var(--transition-smooth);
+}
+.location-tag:hover { border-color: var(--accent-teal); }
+.location-tag.active {
+    background: var(--accent-teal); color: #fff; border-color: var(--accent-teal);
+}
+body.dark-theme .location-tag { background: rgba(255,255,255,0.05); }
+body.dark-theme .location-tag.active { background: var(--accent-teal); color: #fff; }
+
 /* ===== Collections ===== */
 .collections-btn {
     display: inline-flex;
@@ -3265,6 +3362,13 @@ body.dark-theme .pmatch-result-item { background: rgba(255,255,255,0.03); }
                     <span>おすすめ</span>
                 </button>
 
+                <button id="blendBtn" class="dash-btn" title="レシピブレンド">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                    <span>ブレンド</span>
+                </button>
+
                 <button id="photoMatchBtn" class="dash-btn" title="写真からレシピ提案">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -3314,6 +3418,7 @@ body.dark-theme .pmatch-result-item { background: rgba(255,255,255,0.03); }
         <div class="tag-filter-wrap" id="tagFilterWrap">
             <span class="tag-filter-label">シーン:</span>
         </div>
+        <div class="location-tags-wrap" id="locationFilterWrap"></div>
         <div class="coll-filter-wrap" id="collFilterWrap" style="display:none;">
             <span class="coll-filter-label">コレクション:</span>
         </div>
@@ -3395,6 +3500,10 @@ body.dark-theme .pmatch-result-item { background: rgba(255,255,255,0.03); }
                             <div class="coll-recipe-assign" id="collRecipeAssign">
                                 <div class="coll-assign-title">コレクションに追加</div>
                                 <div class="coll-assign-list" id="collAssignList"></div>
+                            </div>
+                            <div class="location-input-wrap">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                <input type="text" class="location-input" id="locationInput" placeholder="撮影場所（例: 渋谷、鎌倉、京都嵐山）">
                             </div>
                             <textarea class="memo-textarea" id="memoTextarea" placeholder="撮影メモ（例: 晴天の屋外で最高、夕方のゴールデンアワーに合う）"></textarea>
                             <button class="memo-save-btn" id="memoSaveBtn">保存</button>
@@ -3614,6 +3723,37 @@ body.dark-theme .pmatch-result-item { background: rgba(255,255,255,0.03); }
                 </div>
             </div>
             <div id="compareResult"></div>
+        </div>
+    </div>
+
+    <!-- Blend Modal -->
+    <div class="blend-overlay" id="blendOverlay">
+        <div class="blend-container">
+            <button class="blend-close" id="blendClose">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="blend-title">レシピブレンド</div>
+            <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:1rem;">2つのレシピの設定を混ぜ合わせて、新しいレシピを作成します</p>
+            <div class="blend-selectors">
+                <div class="blend-select-wrap">
+                    <label>レシピ A</label>
+                    <select id="blendA"></select>
+                </div>
+                <div class="blend-select-wrap">
+                    <label>レシピ B</label>
+                    <select id="blendB"></select>
+                </div>
+            </div>
+            <div class="blend-ratio-wrap">
+                <span style="font-size:0.75rem;">A</span>
+                <input type="range" id="blendRatio" min="0" max="100" value="50">
+                <span style="font-size:0.75rem;">B</span>
+            </div>
+            <div class="blend-ratio-labels">
+                <span id="blendRatioA">50%</span>
+                <span id="blendRatioB">50%</span>
+            </div>
+            <div id="blendResult"></div>
         </div>
     </div>
 
@@ -11479,6 +11619,11 @@ function renderRecipes() {
             if (!recipeTags.includes(activeTagFilter)) return false;
         }
 
+        if (activeLocationFilter) {
+            const locs = getLocations();
+            if (locs[recipe.id] !== activeLocationFilter) return false;
+        }
+
         if (activeCollFilter) {
             const colls = getCollections();
             const coll = colls.find(c => c.name === activeCollFilter);
@@ -12822,6 +12967,144 @@ function populateTagFilter() {
     });
 }
 
+// ===== Location Memo =====
+let activeLocationFilter = '';
+
+function getLocations() {
+    try { return JSON.parse(localStorage.getItem('fuji_locations_original') || '{}'); }
+    catch { return {}; }
+}
+
+function saveLocations(locs) {
+    localStorage.setItem('fuji_locations_original', JSON.stringify(locs));
+}
+
+function loadLocationForRecipe(recipeId) {
+    const locs = getLocations();
+    document.getElementById('locationInput').value = locs[recipeId] || '';
+}
+
+function saveLocationForRecipe() {
+    if (!currentModalRecipeId) return;
+    const locs = getLocations();
+    const val = document.getElementById('locationInput').value.trim();
+    if (val) { locs[currentModalRecipeId] = val; }
+    else { delete locs[currentModalRecipeId]; }
+    saveLocations(locs);
+    populateLocationFilter();
+}
+
+function populateLocationFilter() {
+    const locs = getLocations();
+    const allLocs = new Set(Object.values(locs).filter(v => v));
+    const wrap = document.getElementById('locationFilterWrap');
+    if (allLocs.size === 0) { wrap.innerHTML = ''; return; }
+    wrap.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:14px;height:14px;color:var(--text-muted);flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>';
+    [...allLocs].sort((a, b) => a.localeCompare(b, 'ja')).forEach(loc => {
+        const tag = document.createElement('span');
+        tag.className = 'location-tag' + (activeLocationFilter === loc ? ' active' : '');
+        tag.textContent = loc;
+        tag.addEventListener('click', () => {
+            activeLocationFilter = activeLocationFilter === loc ? '' : loc;
+            populateLocationFilter();
+            renderRecipes();
+        });
+        wrap.appendChild(tag);
+    });
+}
+
+// ===== Recipe Blend =====
+const BLEND_NUMERIC_KEYS = ['highlight_tone', 'shadow_tone', 'color', 'sharpness', 'noise_reduction', 'clarity', 'exposure_compensation'];
+const BLEND_ALL_KEYS = ['film_simulation', 'dynamic_range', 'grain_effect', 'grain_size', 'color_chrome_effect',
+    'color_chrome_fx_blue', 'white_balance', 'highlight_tone', 'shadow_tone', 'color', 'sharpness',
+    'noise_reduction', 'clarity', 'exposure_compensation'];
+
+function openBlend() {
+    const combined = getCombinedRecipes();
+    const opts = combined.map(r => `<option value="${r.id}">${r.title}</option>`).join('');
+    document.getElementById('blendA').innerHTML = '<option value="">選択...</option>' + opts;
+    document.getElementById('blendB').innerHTML = '<option value="">選択...</option>' + opts;
+    document.getElementById('blendRatio').value = 50;
+    document.getElementById('blendRatioA').textContent = '50%';
+    document.getElementById('blendRatioB').textContent = '50%';
+    document.getElementById('blendResult').innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">2つのレシピを選択してください</p>';
+    document.getElementById('blendOverlay').classList.add('open');
+}
+
+function runBlend() {
+    const combined = getCombinedRecipes();
+    const a = combined.find(r => r.id === document.getElementById('blendA').value);
+    const b = combined.find(r => r.id === document.getElementById('blendB').value);
+    if (!a || !b) {
+        document.getElementById('blendResult').innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">2つのレシピを選択してください</p>';
+        return;
+    }
+
+    const ratio = parseInt(document.getElementById('blendRatio').value) / 100;
+    const blended = {};
+    let rows = '';
+
+    BLEND_ALL_KEYS.forEach(key => {
+        const va = (a.settings[key] || '').replace(/&nbsp;/g, ' ').trim();
+        const vb = (b.settings[key] || '').replace(/&nbsp;/g, ' ').trim();
+
+        if (BLEND_NUMERIC_KEYS.includes(key)) {
+            const na = parseFloat(va) || 0;
+            const nb = parseFloat(vb) || 0;
+            const mixed = Math.round((na * (1 - ratio) + nb * ratio) * 10) / 10;
+            blended[key] = key === 'exposure_compensation' ? (mixed >= 0 ? '+' : '') + mixed.toFixed(1) : String(mixed % 1 === 0 ? Math.round(mixed) : mixed);
+        } else {
+            blended[key] = ratio <= 0.5 ? va : vb;
+        }
+
+        const isBlended = blended[key] !== va || blended[key] !== vb;
+        rows += `<tr>
+            <td class="setting-label">${settingLabelsCompare[key] || key}</td>
+            <td>${va || '-'}</td>
+            <td class="${isBlended ? 'blended' : ''}">${blended[key] || '-'}</td>
+            <td>${vb || '-'}</td>
+        </tr>`;
+    });
+
+    document.getElementById('blendResult').innerHTML = `
+        <div class="blend-result-card">
+            <div class="blend-result-title">ブレンド結果</div>
+            <table class="blend-result-table">
+                <thead><tr><th>設定</th><th>${a.title}</th><th style="color:var(--accent-teal);">ブレンド</th><th>${b.title}</th></tr></thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>
+        <button class="blend-save-btn" id="blendSaveBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            マイレシピとして保存
+        </button>`;
+
+    document.getElementById('blendSaveBtn').addEventListener('click', () => {
+        const newRecipe = {
+            title: `${a.title} × ${b.title} Blend`,
+            settings: { ...blended }
+        };
+        document.getElementById('blendOverlay').classList.remove('open');
+        openCreateModal(newRecipe);
+    });
+}
+
+function setupBlend() {
+    const overlay = document.getElementById('blendOverlay');
+    document.getElementById('blendClose').addEventListener('click', () => overlay.classList.remove('open'));
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+    document.getElementById('blendBtn').addEventListener('click', openBlend);
+    document.getElementById('blendA').addEventListener('change', runBlend);
+    document.getElementById('blendB').addEventListener('change', runBlend);
+    const ratioSlider = document.getElementById('blendRatio');
+    ratioSlider.addEventListener('input', () => {
+        const v = parseInt(ratioSlider.value);
+        document.getElementById('blendRatioA').textContent = (100 - v) + '%';
+        document.getElementById('blendRatioB').textContent = v + '%';
+        runBlend();
+    });
+}
+
 // ===== Similar Recipes =====
 function findSimilarRecipes(recipe, maxCount = 5) {
     const combined = getCombinedRecipes();
@@ -12903,6 +13186,7 @@ function loadMemoForRecipe(recipeId) {
         const el = document.getElementById('star' + data.rating);
         if (el) el.checked = true;
     }
+    loadLocationForRecipe(recipeId);
 }
 
 function saveMemoForRecipe() {
@@ -12917,6 +13201,7 @@ function saveMemoForRecipe() {
         delete memos[currentModalRecipeId];
     }
     saveMemos(memos);
+    saveLocationForRecipe();
     renderRecipes();
 }
 
@@ -14345,11 +14630,17 @@ function setupEventListeners() {
     document.getElementById('calNext').addEventListener('click', () => { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); });
 
     setupPhotoMatch();
+    setupBlend();
+    populateLocationFilter();
+
+    document.getElementById('locationInput').addEventListener('change', saveMemoForRecipe);
 
     const pmatchOverlay = document.getElementById('pmatchOverlay');
+    const blendOverlay = document.getElementById('blendOverlay');
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            if (pmatchOverlay.classList.contains('open')) { pmatchOverlay.classList.remove('open'); }
+            if (blendOverlay.classList.contains('open')) { blendOverlay.classList.remove('open'); }
+            else if (pmatchOverlay.classList.contains('open')) { pmatchOverlay.classList.remove('open'); }
             else if (randomOverlay.classList.contains('open')) { randomOverlay.classList.remove('open'); }
             else if (printOverlay.classList.contains('open')) { printOverlay.classList.remove('open'); }
             else if (qrOverlay.classList.contains('open')) { qrOverlay.classList.remove('open'); }
